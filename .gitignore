@@ -1,0 +1,24 @@
+# Secrets
+application-local.yml
+*.pem
+.env
+.env.*
+
+# Build
+target/
+*.jar
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+app.log
