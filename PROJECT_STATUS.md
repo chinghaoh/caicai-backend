@@ -15,7 +15,7 @@
 ## Bootstrap Progress
 
 ```
-[ ] 1.  Database migrations
+[x] 1. Database migrations
 [ ] 2.  Backend entities + repositories
 [ ] 3.  GlobalExceptionHandler + AppException
 [ ] 4.  Auth backend (register, verify, login, logout, forgot/reset password, demo)
