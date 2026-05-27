@@ -16,7 +16,7 @@
 
 ```
 [x] 1. Database migrations
-[ ] 2.  Backend entities + repositories
+[x] 2. Backend entities + repositories
 [ ] 3.  GlobalExceptionHandler + AppException
 [ ] 4.  Auth backend (register, verify, login, logout, forgot/reset password, demo)
 [ ] 5.  Shared frontend components (ui/)

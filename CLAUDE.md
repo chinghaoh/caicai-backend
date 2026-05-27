@@ -59,6 +59,15 @@ Never skip steps. Never build out of order.
 
 ---
 
+## Backlog
+
+- Food search results ordering — favourites first, previously logged second,
+  rest alphabetically. Implement in FoodService when building step 9.
+- AI food recommendations — suggest foods to user based on remaining
+  daily macro goals. Implement after dashboard is built (step 16).
+
+---
+
 ## Data Model
 
 ```
@@ -1033,3 +1042,4 @@ Both repos have GitHub Actions that auto-deploy on push to `main`.
 21. **Redis is required locally** — app fails fast without it, never mock it
 22. **`APP_COOKIE_SECURE=false` locally** — secure cookies over HTTP silently breaks auth
 23. **OpenFoodFacts failures are non-fatal** — catch specifically, log, return cached results
+24. **Hibernate naming strategy doesn't handle numbers correctly** — caloriesPer100g becomes calories_per100g not calories_per_100g. Always use explicit @Column(name = "...") for fields with numbers in the name.

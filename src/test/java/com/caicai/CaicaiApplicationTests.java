@@ -1,4 +1,4 @@
-package com.caicai.caicai;
+package com.caicai;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
