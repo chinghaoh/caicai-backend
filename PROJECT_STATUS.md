@@ -18,7 +18,7 @@
 [x] 1. Database migrations
 [x] 2. Backend entities + repositories
 [x] 3.  GlobalExceptionHandler + AppException
-[ ] 4.  Auth backend (register, verify, login, logout, forgot/reset password, demo)
+[x] 4.  Auth backend (register, verify, login, logout, forgot/reset password, demo)
 [ ] 5.  Shared frontend components (ui/)
 [ ] 6.  apiClient + SessionExpiredModal
 [ ] 7.  Auth frontend pages
