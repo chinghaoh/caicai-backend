@@ -61,6 +61,6 @@ public class User {
     }
 
     public enum ActivityLevel {
-        LIGHT, MODERATE, ACTIVE, VERY_ACTIVE
+        SEDENTARY ,LIGHT, MODERATE, ACTIVE, VERY_ACTIVE
     }
 }

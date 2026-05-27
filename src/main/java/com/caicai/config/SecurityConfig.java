@@ -79,9 +79,8 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
-            Long userId = Long.parseLong(username);
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userId));
+            User user = userRepository.findByEmail(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
             return org.springframework.security.core.userdetails.User
                     .withUsername(String.valueOf(user.getId()))
                     .password(user.getPassword())

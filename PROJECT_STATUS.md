@@ -7,7 +7,7 @@
 
 ## Current Status
 
-**Phase:** Not started — ready to build  
+**Phase:** started — ready to build  
 **Last updated:** 2026-05-27
 
 ---
