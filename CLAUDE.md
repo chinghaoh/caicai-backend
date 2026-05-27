@@ -47,12 +47,14 @@ Never skip steps. Never build out of order.
 7.  Auth frontend pages (register, login, forgot password, reset password)
 8.  Onboarding flow + AI goal suggestion
 9.  Food search (OpenFoodFacts integration + Redis cache)
-10. Food log (core feature)
-11. Water tracking
-12. Weight tracking
-13. Goals (current, history)
-14. Dashboard (daily, weekly, monthly)
-15. Settings (profile, goals)
+10. Favourite foods
+11. Food log (core feature)
+12. Copy day feature
+13. Water tracking
+14. Weight tracking
+15. Goals (current, history)
+16. Dashboard (daily, weekly, monthly)
+17. Settings (profile, goals)
 ```
 
 ---
@@ -61,11 +63,12 @@ Never skip steps. Never build out of order.
 
 ```
 User
-├── FoodItem   (OpenFoodFacts cached + user created)
-├── FoodLog    (userId, foodItemId, amountGrams, mealType, loggedAt)
-├── WaterLog   (userId, amountMl, loggedAt)
-├── WeightLog  (userId, weightKg, loggedAt)
-└── Goal       (userId, calories, protein, carbs, fat, waterMl, startingWeightKg, targetWeightKg, effectiveFrom)
+├── FoodItem            (OpenFoodFacts cached + user created)
+├── FoodLog             (userId, foodItemId, amountGrams, mealType, loggedAt)
+├── WaterLog            (userId, amountMl, loggedAt)
+├── WeightLog           (userId, weightKg, loggedAt)
+├── UserFavouriteFood   (userId, foodItemId)
+└── Goal                (userId, calories, protein, carbs, fat, waterMl, startingWeightKg, targetWeightKg, effectiveFrom)
 ```
 
 ### User
@@ -102,6 +105,11 @@ id, userId, amountMl, loggedAt, createdAt
 ### WeightLog
 ```java
 id, userId, weightKg, loggedAt, createdAt
+```
+
+### UserFavouriteFood
+```java
+userId, foodItemId   // composite primary key, no surrogate id needed
 ```
 
 ### Goal
@@ -202,6 +210,18 @@ PUT    /api/foods/{id}
 DELETE /api/foods/{id}
 ```
 
+### Favourites
+```
+GET    /api/foods/favourites
+POST   /api/foods/{id}/favourite
+DELETE /api/foods/{id}/favourite
+```
+
+### Copy Day
+```
+POST   /api/logs/copy?from=2024-01-14&to=2024-01-15
+```
+
 ### Food Log
 ```
 GET    /api/logs?date=2024-01-15&page=1&size=20
@@ -238,6 +258,18 @@ GET /api/dashboard/summary?date=2024-01-15
 GET /api/dashboard/weekly?date=2024-01-15
 GET /api/dashboard/monthly?date=2024-01-15
 ```
+
+---
+
+## Copy Day Behaviour
+
+`POST /api/logs/copy?from=2024-01-14&to=2024-01-15`
+
+- Copies all FoodLog entries from `from` date to `to` date
+- Creates new log entries — never moves or modifies originals
+- Sets `loggedAt` to current timestamp on all copied entries
+- If `to` date already has log entries, append — never overwrite
+- Returns the newly created log entries
 
 ---
 
@@ -310,6 +342,11 @@ Backend:
 ```
 
 **Cache key format:** `food_search:{query}` (lowercase, trimmed)
+
+**Search result ordering:**
+1. User's favourite foods that match the query (top)
+2. Previously logged foods that match the query
+3. OpenFoodFacts / cached results
 
 ---
 
@@ -441,6 +478,18 @@ Single HTTP wrapper. Every API call goes through this. Never use raw `fetch` in 
 - Lives at app root level — one instance only
 - Shows "Your session has expired. Please log in again." with a login button
 - Never instantiated per-component
+
+---
+
+## Modularity Rules
+
+The backend is domain-based. Adding a new feature means adding a new package — never polluting existing ones.
+
+- Each domain owns its own service, repository, controller, and DTOs
+- Never call one domain's repository from another domain's service — go through the service layer
+- Dashboard is the only exception — it reads from multiple domains but never writes
+- Dashboard service delegates calculations to each domain's own service — never duplicates logic
+- New features require a dashboard update — keep the dashboard service thin
 
 ---
 
