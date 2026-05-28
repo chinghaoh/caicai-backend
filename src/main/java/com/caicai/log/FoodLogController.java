@@ -43,4 +43,12 @@ public class FoodLogController {
         foodLogService.delete(user.getId(), id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/copy")
+    public ResponseEntity<Void> copyDay(
+            @AuthenticationPrincipal User user,
+            @Valid @RequestBody FoodLogDtos.CopyDayRequest dto) {
+        foodLogService.copyDay(user.getId(), dto.getSourceDate(), dto.getTargetDate());
+        return ResponseEntity.noContent().build();
+    }
 }

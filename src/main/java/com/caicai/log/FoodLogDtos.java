@@ -50,4 +50,15 @@ public class FoodLogDtos {
         private Double carbs;
         private Double fat;
     }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CopyDayRequest {
+        @NotNull(message = "Source date is required")
+        private LocalDate sourceDate;
+
+        @NotNull(message = "Target date is required")
+        private LocalDate targetDate;
+    }
 }

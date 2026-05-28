@@ -89,4 +89,27 @@ public class FoodLogService {
     private double round(double value) {
         return Math.round(value * 10.0) / 10.0;
     }
+
+    @Transactional
+    public void copyDay(Long userId, LocalDate sourceDate, LocalDate targetDate) {
+        List<FoodLog> sourceEntries = foodLogRepository.findByUserIdAndDate(userId, sourceDate);
+
+        if (sourceEntries.isEmpty()) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "No entries found for source date");
+        }
+
+        LocalDateTime targetLoggedAt = targetDate.atStartOfDay();
+
+        List<FoodLog> copies = sourceEntries.stream()
+                .map(entry -> FoodLog.builder()
+                        .user(entry.getUser())
+                        .foodItem(entry.getFoodItem())
+                        .amountGrams(entry.getAmountGrams())
+                        .mealType(entry.getMealType())
+                        .loggedAt(targetLoggedAt)
+                        .build())
+                .toList();
+
+        foodLogRepository.saveAll(copies);
+    }
 }

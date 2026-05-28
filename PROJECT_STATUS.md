@@ -26,7 +26,7 @@
 [x] 9.  Food search (OpenFoodFacts + Redis cache)
 [x] 10. Favourite foods
 [x] 11. Food log
-[ ] 12. Copy day feature
+[x] 12. Copy day feature
 [ ] 13. Water tracking
 [ ] 14. Weight tracking
 [ ] 15. Goals (current, history)
@@ -102,7 +102,6 @@
 - UserService.getIdByEmail(String email) added as a wrapper around userRepository.findByEmail
 - JwtAuthFilter sets principal as User entity, not UserDetails — always use @AuthenticationPrincipal User user in controllers, never UserDetails. Call user.getId() directly
 
-- JwtAuthFilter sets principal as User entity — always use @AuthenticationPrincipal User user in controllers, never UserDetails. Call user.getId() directly.
 - apiClient must handle empty responses (204 No Content) — use response.text() then JSON.parse only if non-empty, otherwise default to {}
 - Never call JSON.stringify on body in components — apiClient handles serialization itself
 = OpenFoodFacts rate limiting is a known issue — try to look for alternative later, cached PostgreSQL data still work
@@ -118,9 +117,9 @@ src/components/ui/StatCard.jsx
 src/components/ui/PageHeader.jsx
 src/components/ui/EmptyState.jsx
 src/components/ui/FilterPills.jsx
+src/components/ui/FoodItemCard.jsx
 src/components/ui/Pagination.jsx
 src/components/ui/LoadingSpinner.jsx
-src/components/ui/FilterPills.jsx
 src/components/ui/ProgressBar.jsx
 src/components/ui/MacroBadge.jsx
 src/components/ui/SessionExpiredModal.jsx
@@ -140,7 +139,11 @@ src/pages/onboarding/StepBasics.jsx
 src/pages/onboarding/StepGoals.jsx
 src/pages/onboarding/StepSuggestion.jsx
 
-src/components/ui/FoodItemCard.jsx
+
+src/pages/food-log/FoodLogView.jsx
+src/pages/food-log/FoodLogTable.jsx
+src/pages/food-log/FoodLogCard.jsx
+src/pages/food-log/FoodLog.jsx
 
 Backend
 
@@ -180,9 +183,6 @@ src/main/java/com/caicai/goal/GoalService.java
 src/main/java/com/caicai/config/RestTemplateConfig.java
 
 src/main/java/com/caicai/log/FoodLog.java
-src/pages/food-log/FoodLogView.jsx
-src/pages/food-log/FoodLogTable.jsx
-src/pages/food-log/FoodLogCard.jsx
 
 src/main/java/com/caicai/log/FoodLogRepository.java
 src/main/java/com/caicai/log/FoodLogDtos.java
@@ -206,7 +206,7 @@ src/main/java/com/caicai/weight/WeightRepository.java
 
 ## Current Task
 
-Step 12 — Copy day feature
+Step 13 — water tracking
 ---
 
 ## Known Issues / Blockers
@@ -214,6 +214,13 @@ Step 12 — Copy day feature
 _Anything broken, unclear, or blocking progress._
 
 None.
+
+---
+
+## Backlog
+- Edit food log entry — PUT /api/food-logs/{id}, change amountGrams and mealType. Frontend: edit modal. Implement during polish pass.
+- OpenFoodFacts replacement — find alternative food data API. Cached PostgreSQL data works in the meantime.
+
 
 ---
 
