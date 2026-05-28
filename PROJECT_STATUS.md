@@ -220,7 +220,7 @@ None.
 ## Backlog
 - Edit food log entry — PUT /api/food-logs/{id}, change amountGrams and mealType. Frontend: edit modal. Implement during polish pass.
 - OpenFoodFacts replacement — find alternative food data API. Cached PostgreSQL data works in the meantime.
-
+- Need to rethink our current designs after the whole frontend has been implemented
 
 ---
 
