@@ -36,13 +36,14 @@
 [ ] 15. apiClient + SessionExpiredModal
 [ ] 16. Auth frontend pages
 [ ] 17. Onboarding flow + AI goal suggestion frontend
-[ ] 18. Food search + Favourite foods frontend
-[ ] 19. Food log + Copy day frontend
-[ ] 20. Water tracking frontend
-[ ] 21. Weight tracking frontend
-[ ] 22. Goals frontend
-[ ] 23. Dashboard frontend
-[ ] 14. Settings frontend
+[ ] 18. Use another food api
+[ ] 19. Food search + Favourite foods frontend
+[ ] 20. Food log + Copy day frontend
+[ ] 21. Water tracking frontend
+[ ] 22. Weight tracking frontend
+[ ] 23. Goals frontend
+[ ] 24. Dashboard frontend
+[ ] 15. Settings frontend
 ```
 
 ---
