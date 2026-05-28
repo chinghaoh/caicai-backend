@@ -17,6 +17,18 @@ A weight management and nutrition tracking web app. Users log meals, track macro
 
 ---
 
+## Output Discipline
+
+Build one file at a time. After each file, stop and wait for confirmation before
+proceeding to the next. Never produce multiple files in a single response.
+
+Order within a step:
+1. State which file you're about to write and why
+2. Write it
+3. Stop — wait for "good" or feedback before continuing
+
+---
+
 ## Before Writing Any Code — Checklist
 
 Before implementing any feature ask yourself:
@@ -66,8 +78,12 @@ Never skip steps. Never build out of order.
 - AI food recommendations — suggest foods to user based on remaining
   daily macro goals. Implement after dashboard is built (step 16).
 - Structured logging — add log levels and correlation IDs to make
-    debugging production issues easier. Implement before first
-    production deployment.
+  debugging production issues easier. Implement before first
+  production deployment.
+- Macro education tooltips — show a small info popup on each macro
+  (protein, carbs, fat, calories) explaining what it does and why it matters.
+  Extensible for when fiber, sodium, and sugar are added to the UI.
+  Implement after dashboard is built (step 16).
 
 ---
 
@@ -530,8 +546,8 @@ Never optimize prematurely. If there's no evidence of a problem, don't solve it.
 
 ```css
 @theme {
-  --color-green:         #22c55e;
-  --color-green-light:   #4ade80;
+  --color-green:         #10b981;
+  --color-green-light:   #86efac;
   --color-green-bg:      #052e16;
   --color-orange:        #f97316;
   --color-orange-bg:     #431407;
@@ -601,6 +617,8 @@ src/components/ui/
   ProgressBar.jsx     ← { value, max, color }
   MacroBadge.jsx      ← { protein, carbs, fat, calories }
   SessionExpiredModal ← global, lives in App.jsx
+  Button.jsx          ← { children, variant, loading, disabled, fullWidth }
+  Input.jsx           ← { label, type, value, onChange, error, placeholder }
 ```
 
 Usage examples:
@@ -1045,5 +1063,8 @@ Both repos have GitHub Actions that auto-deploy on push to `main`.
 21. **Redis is required locally** — app fails fast without it, never mock it
 22. **`APP_COOKIE_SECURE=false` locally** — secure cookies over HTTP silently breaks auth
 23. **OpenFoodFacts failures are non-fatal** — catch specifically, log, return cached results
-24. **Hibernate naming strategy doesn't handle numbers correctly** — caloriesPer100g becomes calories_per100g not calories_per_100g. Always use explicit @Column(name = "...") for fields with numbers in the name.
-25. To view live logs on EC2: ssh into instance and run `tail -f ~/app.log`. Always check logs before assuming production is broken.
+24. **Hibernate naming strategy doesn't handle numbers correctly** — caloriesPer100g becomes calories_per100g not   
+    calories_per_100g. Always use explicit @Column(name = "...") for fields with numbers in the name.
+25. **To view live logs on EC2 : ssh into instance and run `tail -f ~/app.log`** . Always check logs before assuming production is broken.
+26. **401 on auth endpoints is a login failure, not session expiry** —
+    never trigger SessionExpiredModal on /api/auth/* routes

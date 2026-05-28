@@ -151,6 +151,7 @@ public class AuthService {
                 .name("Demo User")
                 .isVerified(true)
                 .isDemo(true)
+                .hasCompletedOnboarding(false)
                 .build();
 
         userRepository.save(user);
@@ -186,7 +187,8 @@ public class AuthService {
                 user.getEmail(),
                 user.getName(),
                 user.isVerified(),
-                user.isDemo()
+                user.isDemo(),
+                user.isHasCompletedOnboarding()
         );
     }
 }

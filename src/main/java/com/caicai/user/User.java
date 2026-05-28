@@ -48,6 +48,9 @@ public class User {
     @Column(nullable = false)
     private boolean isDemo = false;
 
+    @Column(nullable = false)
+    private boolean hasCompletedOnboarding = false;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -61,6 +64,6 @@ public class User {
     }
 
     public enum ActivityLevel {
-        SEDENTARY ,LIGHT, MODERATE, ACTIVE, VERY_ACTIVE
+        SEDENTARY, LIGHT, MODERATE, ACTIVE, VERY_ACTIVE
     }
 }

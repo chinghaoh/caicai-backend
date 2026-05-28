@@ -54,6 +54,7 @@ public class AuthDtos {
             String email,
             String name,
             boolean isVerified,
-            boolean isDemo
+            boolean isDemo,
+            boolean hasCompletedOnboarding
     ) {}
 }

@@ -8,7 +8,7 @@
 ## Current Status
 
 **Phase:** started — ready to build  
-**Last updated:** 2026-05-28 11:12
+**Last updated:** 2026-05-28 11:53
 
 ---
 
@@ -59,6 +59,16 @@
 - Output discipline rule added to CLAUDE.md — one file at a time, stop and wait for confirmation
 - RestTemplate declared as a @Bean in RestTemplateConfig — Spring Boot does not auto-configure it
 - Anthropic API key must be set as environment variable ANTHROPIC_API_KEY and referenced in application.properties as anthropic.api-key=${ANTHROPIC_API_KEY}
+
+- Demo users go through onboarding (hasCompletedOnboarding = false) — AI suggestion
+  is a key feature worth showcasing
+- Demo banner added to onboarding — informs user what the flow is for
+- AuthContext deferred from step 7 — being built now as part of step 8
+- Auth routing strategy: App load calls GET /api/users/me to check auth state.
+  401 = not authenticated. 200 = authenticated, route based on hasCompletedOnboarding
+- Login redirects to /onboarding if hasCompletedOnboarding = false, /dashboard if true
+- Skip onboarding sets hasCompletedOnboarding = true on backend — never re-asked on next login
+- Gender.OTHER left in User enum — frontend only exposes Male/Female, no migration needed now
 
 ---
 
@@ -123,6 +133,9 @@ src/main/java/com/caicai/log/FoodLogRepository.java
 
 src/main/java/com/caicai/user/User.java
 src/main/java/com/caicai/user/UserRepository.java
+src/main/java/com/caicai/user/UserService.java
+src/main/java/com/caicai/user/UserDtos.java
+src/main/java/com/caicai/user/UserController.java
 
 src/main/java/com/caicai/water/WaterLog.java
 src/main/java/com/caicai/water/WaterRepository.java
@@ -135,7 +148,7 @@ src/main/java/com/caicai/weight/WeightRepository.java
 
 ## Current Task
 
-Step 8 — Onboarding flow + AI goal suggestion (backend done, frontend in progress)
+Step 8 — Onboarding flow + AI goal suggestion (backend done, building AuthContext)
 ---
 
 ## Known Issues / Blockers
