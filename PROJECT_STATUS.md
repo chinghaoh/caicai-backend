@@ -8,7 +8,7 @@
 ## Current Status
 
 **Phase:** started — ready to build  
-**Last updated:** 2026-05-28 11:53
+**Last updated:** 2026-05-28 12:53
 
 ---
 
@@ -22,7 +22,7 @@
 [x] 5.  Shared frontend components (ui/)
 [x] 6.  apiClient + SessionExpiredModal
 [x] 7.  Auth frontend pages
-[ ] 8.  Onboarding flow + AI goal suggestion
+[x] 8.  Onboarding flow + AI goal suggestion
 [ ] 9.  Food search (OpenFoodFacts + Redis cache)
 [ ] 10. Favourite foods
 [ ] 11. Food log
@@ -72,6 +72,10 @@
 
 - apiClient returns json.data directly (envelope already unwrapped).
   Never do data.data in components — use data directly.
+- Anthropic model string is claude-opus-4-5 (not claude-opus-4-20250514)
+- AI suggestion failure falls through to manual entry (AdjustForm) instead of dead-end error
+- Placeholder /dashboard route added to App.jsx — will be replaced in step 16
+- completeOnboarding() called in AuthContext after save and skip to keep in-memory user state in sync
 
 ---
 
@@ -158,7 +162,7 @@ src/main/java/com/caicai/weight/WeightRepository.java
 
 ## Current Task
 
-Step 8 — Onboarding flow + AI goal suggestion (updating Onboarding.jsx for skip and save)
+Step 9 — Food search (OpenFoodFacts + Redis cache)
 ---
 
 ## Known Issues / Blockers
