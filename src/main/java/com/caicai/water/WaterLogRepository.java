@@ -13,4 +13,7 @@ public interface WaterLogRepository extends JpaRepository<WaterLog, Long> {
 
     @Query("SELECT w FROM WaterLog w WHERE w.user.id = :userId AND DATE(w.loggedAt) = :date ORDER BY w.loggedAt ASC")
     List<WaterLog> findByUserIdAndDate(@Param("userId") Long userId, @Param("date") LocalDate date);
+
+    @Query("SELECT w FROM WaterLog w WHERE w.user.id = :userId AND DATE(w.loggedAt) BETWEEN :from AND :to ORDER BY w.loggedAt ASC")
+    List<WaterLog> findByUserIdAndDateBetween(@Param("userId") Long userId, @Param("from") LocalDate from, @Param("to") LocalDate to);
 }

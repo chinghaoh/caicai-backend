@@ -29,8 +29,8 @@
 [x] 12. Copy day feature
 [x] 9.  Water tracking backend
 [x] 10. Weight tracking backend
-[ ] 11. Goals backend (suggest + save)
-[ ] 12. Dashboard backend (daily, weekly, monthly)
+[x] 11. Goals backend (suggest + save)
+[x] 12. Dashboard backend (daily, weekly, monthly)
 [ ] 13. Settings backend (profile, goals)
 [ ] 14. Shared frontend components (ui/)
 [ ] 15. apiClient + SessionExpiredModal
@@ -223,7 +223,7 @@ src/main/java/com/caicai/weight/WeightController.java
 
 ## Current Task
 
-Step 11 — Goals backend (suggest + save)
+Step 13 — Settings backend (profile, goals)
 ---
 
 ## Known Issues / Blockers
@@ -249,6 +249,8 @@ None.
   (protein, carbs, fat, calories) explaining what it does and why it matters.
   Extensible for when fiber, sodium, and sugar are added to the UI.
   Implement after dashboard is built (step 16).
+-  Review all service methods for single point of failure — decide whether to use fault-tolerant try/catch per section (dashboard pattern) 
+   or let exceptions propagate (domain endpoints). Document the decision per feature during polish pass.
 ---
 
 ## How To Use This File
