@@ -95,6 +95,13 @@ src/pages/auth/Register.jsx
 src/pages/auth/ForgotPassword.jsx
 src/pages/auth/ResetPassword.jsx
 
+src/components/ui/RadioCard.jsx
+src/context/AuthContext.jsx
+src/pages/onboarding/Onboarding.jsx
+src/pages/onboarding/StepBasics.jsx
+src/pages/onboarding/StepGoals.jsx
+src/pages/onboarding/StepSuggestion.jsx
+
 Backend
 
 src/main/java/com/caicai/auth/AuthController.java
@@ -148,7 +155,7 @@ src/main/java/com/caicai/weight/WeightRepository.java
 
 ## Current Task
 
-Step 8 — Onboarding flow + AI goal suggestion (backend done, building AuthContext)
+Step 8 — Onboarding flow + AI goal suggestion (updating Onboarding.jsx for skip and save)
 ---
 
 ## Known Issues / Blockers

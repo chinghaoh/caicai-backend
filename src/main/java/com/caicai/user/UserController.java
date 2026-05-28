@@ -19,4 +19,10 @@ public class UserController {
         UserDtos.UserResponse response = userService.getMe(user);
         return ResponseEntity.ok(Map.of("data", response));
     }
+
+    @PostMapping("/me/complete-onboarding")
+    public ResponseEntity<Map<String, String>> completeOnboarding(@AuthenticationPrincipal User user) {
+        userService.completeOnboarding(user);
+        return ResponseEntity.ok(Map.of("message", "Onboarding completed"));
+    }
 }

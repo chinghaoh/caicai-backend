@@ -27,6 +27,14 @@ Order within a step:
 2. Write it
 3. Stop — wait for "good" or feedback before continuing
 
+At the end of every step, before committing, provide a PROJECT_STATUS.md update summary containing:
+- Which bootstrap step to check off
+- Any new decisions to add
+- All new files created with their full paths
+- All existing files modified with their full paths
+- What to set as the Current Task
+- Any new blockers or known issues
+
 ---
 
 ## Before Writing Any Code — Checklist
@@ -227,6 +235,7 @@ POST /api/auth/demo
 GET    /api/users/me
 PUT    /api/users/me
 DELETE /api/users/me
+POST   /api/users/me/complete-onboarding
 ```
 
 ### Food Items
@@ -324,14 +333,16 @@ GET /api/dashboard/monthly?date=2024-01-15
 6. Redirect to /dashboard
 7. Onboarding is skippable — show helper text:
    "You can set your goals anytime in Settings"
-8. If skipped → no Goal record created, dashboard shows empty goal state
+8. 8. If skipped → POST /api/users/me/complete-onboarding, 
+   no Goal record created, dashboard shows empty goal state
 ```
 
 ### Login
 ```
 1. POST /api/auth/login
 2. Backend returns JWT cookie
-3. Redirect to /dashboard
+3. hasCompletedOnboarding = true  → /dashboard
+4. hasCompletedOnboarding = false → /onboarding
 ```
 
 ### Password Reset
@@ -619,6 +630,8 @@ src/components/ui/
   SessionExpiredModal ← global, lives in App.jsx
   Button.jsx          ← { children, variant, loading, disabled, fullWidth }
   Input.jsx           ← { label, type, value, onChange, error, placeholder }
+  RadioCard.jsx       ← { label, description?, icon?, selected, onClick }
+
 ```
 
 Usage examples:
@@ -651,6 +664,9 @@ pages/
     GoalHistory.jsx
   onboarding/
     Onboarding.jsx
+    StepBasics.jsx
+    StepGoals.jsx
+    StepSuggestion.jsx
   settings/
     Settings.jsx
 ```
@@ -1068,3 +1084,6 @@ Both repos have GitHub Actions that auto-deploy on push to `main`.
 25. **To view live logs on EC2 : ssh into instance and run `tail -f ~/app.log`** . Always check logs before assuming production is broken.
 26. **401 on auth endpoints is a login failure, not session expiry** —
     never trigger SessionExpiredModal on /api/auth/* routes
+27. In IntelliJ, system environment variables are not passed to the JVM automatically —
+        either add them to the run configuration or use raw values in application-local.yml.
+        Never commit raw secrets to git.

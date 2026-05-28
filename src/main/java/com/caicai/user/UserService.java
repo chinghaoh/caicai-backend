@@ -9,8 +9,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UserService {
 
+    private final UserRepository userRepository;
+
     public UserDtos.UserResponse getMe(User user) {
         return toUserResponse(user);
+    }
+
+    @Transactional
+    public void completeOnboarding(User user) {
+        user.setHasCompletedOnboarding(true);
+        userRepository.save(user);
     }
 
     private UserDtos.UserResponse toUserResponse(User user) {

@@ -2,6 +2,7 @@ package com.caicai.goal;
 
 import com.caicai.common.AppException;
 import com.caicai.user.User;
+import com.caicai.user.UserRepository;
 import com.caicai.weight.WeightLog;
 import com.caicai.weight.WeightLogRepository;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,6 +31,7 @@ public class GoalService {
 
     private final GoalRepository goalRepository;
     private final WeightLogRepository weightLogRepository;
+    private final UserRepository userRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
@@ -110,6 +112,9 @@ public class GoalService {
                 .build();
 
         weightLogRepository.save(weightLog);
+
+        user.setHasCompletedOnboarding(true);
+        userRepository.save(user);
 
         return toGoalResponse(goal);
     }
