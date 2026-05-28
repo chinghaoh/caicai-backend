@@ -92,6 +92,8 @@ Never skip steps. Never build out of order.
   (protein, carbs, fat, calories) explaining what it does and why it matters.
   Extensible for when fiber, sodium, and sugar are added to the UI.
   Implement after dashboard is built (step 16).
+- Write backend service tests for all business logic once all backend steps are complete (steps 9–13). 
+  Cover: calorie/macro totals, goal progress calculations, dashboard aggregations, date boundary edge cases, ownership checks.
 
 ---
 
@@ -632,7 +634,6 @@ src/components/ui/
   Input.jsx           ← { label, type, value, onChange, error, placeholder }
   RadioCard.jsx       ← { label, description?, icon?, selected, onClick }
   FoodItemCard.jsx    ← { food, onAdd } — food name, brand, macro dots (Protein/Carbs/Fat), + button  
-  FilterPills.jsx     ← { options: [{ value, label }], active, onChange }
 ```
 
 Usage examples:
@@ -1088,3 +1089,9 @@ Both repos have GitHub Actions that auto-deploy on push to `main`.
 27. In IntelliJ, system environment variables are not passed to the JVM automatically —
         either add them to the run configuration or use raw values in application-local.yml.
         Never commit raw secrets to git.
+28. **Backend first, frontend second** — build all backend endpoints before any frontend pages. Interleaving them causes rework when API shapes change.
+29. **Never call JSON.stringify on body in apiClient calls** — apiClient handles serialization. Pass raw objects only.
+30. **apiClient must handle empty responses (204 No Content)** — use response.text() then JSON.parse only if non-empty, otherwise default to {}.
+31. **@AuthenticationPrincipal User user in controllers, never UserDetails** — JwtAuthFilter sets principal as User entity. Call user.getId() directly.
+32. **AppException constructor is (HttpStatus, String)** — status first, message second. Never swap them.
+33. **BigDecimal arithmetic requires .doubleValue()** — cannot multiply BigDecimal by double directly.

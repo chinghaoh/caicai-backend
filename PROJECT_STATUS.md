@@ -27,11 +27,22 @@
 [x] 10. Favourite foods
 [x] 11. Food log
 [x] 12. Copy day feature
-[ ] 13. Water tracking
-[ ] 14. Weight tracking
-[ ] 15. Goals (current, history)
-[ ] 16. Dashboard (daily, weekly, monthly)
-[ ] 17. Settings (profile, goals)
+[x] 9.  Water tracking backend
+[ ] 10. Weight tracking backend
+[ ] 11. Goals backend (suggest + save)
+[ ] 12. Dashboard backend (daily, weekly, monthly)
+[ ] 13. Settings backend (profile, goals)
+[ ] 14. Shared frontend components (ui/)
+[ ] 15. apiClient + SessionExpiredModal
+[ ] 16. Auth frontend pages
+[ ] 17. Onboarding flow + AI goal suggestion frontend
+[ ] 18. Food search + Favourite foods frontend
+[ ] 19. Food log + Copy day frontend
+[ ] 20. Water tracking frontend
+[ ] 21. Weight tracking frontend
+[ ] 22. Goals frontend
+[ ] 23. Dashboard frontend
+[ ] 14. Settings frontend
 ```
 
 ---
@@ -196,7 +207,10 @@ src/main/java/com/caicai/user/UserDtos.java
 src/main/java/com/caicai/user/UserController.java
 
 src/main/java/com/caicai/water/WaterLog.java
-src/main/java/com/caicai/water/WaterRepository.java
+src/main/java/com/caicai/water/WaterLogRepository.java
+src/main/java/com/caicai/water/WaterDtos.java
+src/main/java/com/caicai/water/WaterService.java
+src/main/java/com/caicai/water/WaterController.java
 
 src/main/java/com/caicai/weight/WeightLog.java
 src/main/java/com/caicai/weight/WeightRepository.java
@@ -206,7 +220,7 @@ src/main/java/com/caicai/weight/WeightRepository.java
 
 ## Current Task
 
-Step 13 — water tracking
+Step 10 — weight tracking backend
 ---
 
 ## Known Issues / Blockers
@@ -221,7 +235,17 @@ None.
 - Edit food log entry — PUT /api/food-logs/{id}, change amountGrams and mealType. Frontend: edit modal. Implement during polish pass.
 - OpenFoodFacts replacement — find alternative food data API. Cached PostgreSQL data works in the meantime.
 - Need to rethink our current designs after the whole frontend has been implemented
-
+- Write backend service tests for all business logic once all backend steps are complete (steps 9–13).
+  Cover: calorie/macro totals, goal progress calculations, dashboard aggregations, date boundary edge cases, ownership checks.
+- AI food recommendations — suggest foods to user based on remaining
+  daily macro goals. Implement after dashboard is built (step 16).
+- Structured logging — add log levels and correlation IDs to make
+  debugging production issues easier. Implement before first
+  production deployment.
+- Macro education tooltips — show a small info popup on each macro
+  (protein, carbs, fat, calories) explaining what it does and why it matters.
+  Extensible for when fiber, sodium, and sugar are added to the UI.
+  Implement after dashboard is built (step 16).
 ---
 
 ## How To Use This File
