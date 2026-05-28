@@ -70,6 +70,9 @@
 - Skip onboarding sets hasCompletedOnboarding = true on backend — never re-asked on next login
 - Gender.OTHER left in User enum — frontend only exposes Male/Female, no migration needed now
 
+- apiClient returns json.data directly (envelope already unwrapped).
+  Never do data.data in components — use data directly.
+
 ---
 
 ## Files Created So Far

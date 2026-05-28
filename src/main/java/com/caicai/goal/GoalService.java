@@ -39,7 +39,7 @@ public class GoalService {
     private String anthropicApiKey;
 
     private static final String ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
-    private static final String ANTHROPIC_MODEL = "claude-opus-4-20250514";
+    private static final String ANTHROPIC_MODEL = "claude-opus-4-5";
 
     public GoalDtos.SuggestResponse suggest(GoalDtos.SuggestRequest request) {
         String prompt = buildPrompt(request);
