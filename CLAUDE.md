@@ -632,7 +632,7 @@ src/components/ui/
   Input.jsx           ← { label, type, value, onChange, error, placeholder }
   RadioCard.jsx       ← { label, description?, icon?, selected, onClick }
   FoodItemCard.jsx    ← { food, onAdd } — food name, brand, macro dots (Protein/Carbs/Fat), + button  
-
+  FilterPills.jsx     ← { options: [{ value, label }], active, onChange }
 ```
 
 Usage examples:

@@ -25,7 +25,7 @@
 [x] 8.  Onboarding flow + AI goal suggestion
 [x] 9.  Food search (OpenFoodFacts + Redis cache)
 [x] 10. Favourite foods
-[ ] 11. Food log
+[x] 11. Food log
 [ ] 12. Copy day feature
 [ ] 13. Water tracking
 [ ] 14. Weight tracking
@@ -100,8 +100,12 @@
 - loggedAt stored as date.atStartOfDay() — client sends date only, not a full timestamp
 - BigDecimal macro fields must be converted via .doubleValue() before arithmetic in FoodLogService
 - UserService.getIdByEmail(String email) added as a wrapper around userRepository.findByEmail
+- JwtAuthFilter sets principal as User entity, not UserDetails — always use @AuthenticationPrincipal User user in controllers, never UserDetails. Call user.getId() directly
 
-
+- JwtAuthFilter sets principal as User entity — always use @AuthenticationPrincipal User user in controllers, never UserDetails. Call user.getId() directly.
+- apiClient must handle empty responses (204 No Content) — use response.text() then JSON.parse only if non-empty, otherwise default to {}
+- Never call JSON.stringify on body in components — apiClient handles serialization itself
+= OpenFoodFacts rate limiting is a known issue — try to look for alternative later, cached PostgreSQL data still work
 
 ---
 
@@ -116,6 +120,7 @@ src/components/ui/EmptyState.jsx
 src/components/ui/FilterPills.jsx
 src/components/ui/Pagination.jsx
 src/components/ui/LoadingSpinner.jsx
+src/components/ui/FilterPills.jsx
 src/components/ui/ProgressBar.jsx
 src/components/ui/MacroBadge.jsx
 src/components/ui/SessionExpiredModal.jsx
@@ -175,6 +180,10 @@ src/main/java/com/caicai/goal/GoalService.java
 src/main/java/com/caicai/config/RestTemplateConfig.java
 
 src/main/java/com/caicai/log/FoodLog.java
+src/pages/food-log/FoodLogView.jsx
+src/pages/food-log/FoodLogTable.jsx
+src/pages/food-log/FoodLogCard.jsx
+
 src/main/java/com/caicai/log/FoodLogRepository.java
 src/main/java/com/caicai/log/FoodLogDtos.java
 src/main/java/com/caicai/log/FoodLogService.java
@@ -197,7 +206,7 @@ src/main/java/com/caicai/weight/WeightRepository.java
 
 ## Current Task
 
-Step 11 — Food log (backend done, frontend in progress)
+Step 12 — Copy day feature
 ---
 
 ## Known Issues / Blockers

@@ -82,7 +82,7 @@ public class SecurityConfig {
             User user = userRepository.findByEmail(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
             return org.springframework.security.core.userdetails.User
-                    .withUsername(String.valueOf(user.getId()))
+                    .withUsername(user.getEmail())
                     .password(user.getPassword())
                     .roles("USER")
                     .build();

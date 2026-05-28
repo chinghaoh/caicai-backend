@@ -2,6 +2,7 @@ package com.caicai.log;
 
 import com.caicai.log.FoodLogDtos.CreateFoodLogRequest;
 import com.caicai.log.FoodLogDtos.FoodLogResponse;
+import com.caicai.user.User;
 import com.caicai.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,30 +21,26 @@ import java.util.List;
 public class FoodLogController {
 
     private final FoodLogService foodLogService;
-    private final UserService userService;
 
     @PostMapping
     public ResponseEntity<FoodLogResponse> create(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal User user,
             @Valid @RequestBody CreateFoodLogRequest dto) {
-        Long userId = userService.getIdByEmail(userDetails.getUsername());
-        return ResponseEntity.ok(foodLogService.create(userId, dto));
+        return ResponseEntity.ok(foodLogService.create(user.getId(), dto));
     }
 
     @GetMapping
     public ResponseEntity<List<FoodLogResponse>> getByDate(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal User user,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        Long userId = userService.getIdByEmail(userDetails.getUsername());
-        return ResponseEntity.ok(foodLogService.getByDate(userId, date));
+        return ResponseEntity.ok(foodLogService.getByDate(user.getId(), date));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal User user,
             @PathVariable Long id) {
-        Long userId = userService.getIdByEmail(userDetails.getUsername());
-        foodLogService.delete(userId, id);
+        foodLogService.delete(user.getId(), id);
         return ResponseEntity.noContent().build();
     }
 }
