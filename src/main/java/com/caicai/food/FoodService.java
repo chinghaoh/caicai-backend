@@ -32,8 +32,12 @@ public class FoodService {
 
         if (!isCached(cacheKey)) {
             List<FoodItem> offResults = offClient.search(query);
-            persistNewItems(offResults);
-            cacheQuery(cacheKey, query);
+            if (!offResults.isEmpty()) {
+                persistNewItems(offResults);
+                cacheQuery(cacheKey, query);
+            } else {
+                log.warn("OpenFoodFacts returned no results for query '{}', skipping cache", query);
+            }
         }
 
         List<FoodItem> dbResults = foodItemRepository.searchByName(query);
@@ -67,12 +71,15 @@ public class FoodService {
     }
 
     private void persistNewItems(List<FoodItem> items) {
+        int saved = 0;
         for (FoodItem item : items) {
             if (item.getExternalId() != null &&
                     !foodItemRepository.existsByExternalId(item.getExternalId())) {
                 foodItemRepository.save(item);
+                saved++;
             }
         }
+        log.info("Persisted {} new food items to database", saved);
     }
 
     private void cacheQuery(String cacheKey, String query) {

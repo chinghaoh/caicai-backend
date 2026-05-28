@@ -40,6 +40,8 @@ app:
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:5173}
+  openfoodfacts:
+    user-agent: ${OPENFOODFACTS_USER_AGENT:Caicai/1.0 (caicai@caicai.app)}
   cookie:
     secure: ${APP_COOKIE_SECURE:false}
   jwt:

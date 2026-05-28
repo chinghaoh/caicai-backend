@@ -631,6 +631,7 @@ src/components/ui/
   Button.jsx          ← { children, variant, loading, disabled, fullWidth }
   Input.jsx           ← { label, type, value, onChange, error, placeholder }
   RadioCard.jsx       ← { label, description?, icon?, selected, onClick }
+  FoodItemCard.jsx    ← { food, onAdd } — food name, brand, macro dots (Protein/Carbs/Fat), + button  
 
 ```
 

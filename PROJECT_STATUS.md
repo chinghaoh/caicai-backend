@@ -23,7 +23,7 @@
 [x] 6.  apiClient + SessionExpiredModal
 [x] 7.  Auth frontend pages
 [x] 8.  Onboarding flow + AI goal suggestion
-[] 9.  Food search (OpenFoodFacts + Redis cache)
+[x] 9.  Food search (OpenFoodFacts + Redis cache)
 [ ] 10. Favourite foods
 [ ] 11. Food log
 [ ] 12. Copy day feature
@@ -81,6 +81,14 @@
 - Minimum query length of 2 characters enforced in FoodController before hitting the service.
 - FoodDtos.FoodItemResponse includes isFavourite to avoid a second request from the frontend.
 - Result ordering in FoodService: favourites first, then alphabetical. Previously-logged ordering deferred to step 11 when FoodLog queries are available.
+- Redis is a fetch-guard only — presence of key means query already fetched from OpenFoodFacts. Results always read from PostgreSQL. Not a product cache.
+- Only cache if OpenFoodFacts returns results. Empty results do not set the cache key — prevents poisoning the cache on 503s.
+- User-Agent header required by OpenFoodFacts — anonymous requests get rate limited with 503. Configured via app.openfoodfacts.user-agent in application.yml.
+- created_by is null for OpenFoodFacts items by design — only set for USER_CREATED foods.
+- FoodItemCard.jsx frontend test deferred to step 11 — testing in isolation with hardcoded props doesn't prove integration. Real test is when wired to live search in food log page.
+- Food log page loads with empty state + search bar. No preloaded products. Results appear on user input with 300ms debounce. Recent foods (from FoodLog) shown when search is empty — implement in step 11.
+- ObjectMapper and TypeReference were incorrectly included in FoodService imports — removed.
+- @RequiredArgsConstructor dropped from OpenFoodFactsClient — @Value doesn't work with Lombok's generated constructors, switched to manual constructor.
 ---
 
 ## Files Created So Far
@@ -112,6 +120,8 @@ src/pages/onboarding/Onboarding.jsx
 src/pages/onboarding/StepBasics.jsx
 src/pages/onboarding/StepGoals.jsx
 src/pages/onboarding/StepSuggestion.jsx
+
+src/components/ui/FoodItemCard.jsx
 
 Backend
 
@@ -170,7 +180,7 @@ src/main/java/com/caicai/weight/WeightRepository.java
 
 ## Current Task
 
-Step 9 — Food search (OpenFoodFacts + Redis cache) — backend only. Frontend (FoodItemCard.jsx) todo
+Step 10  — Favourite foods
 ---
 
 ## Known Issues / Blockers

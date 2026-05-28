@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -13,15 +15,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class OpenFoodFactsClient {
 
-    private static final String BASE_URL = "https://world.openfoodfacts.org/cgi/search.pl";
-    private static final int PAGE_SIZE = 20;
+    private static final String BASE_URL  = "https://world.openfoodfacts.org/cgi/search.pl";
+    private static final int    PAGE_SIZE = 20;
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private final String       userAgent;
+
+    public OpenFoodFactsClient(
+            RestTemplate restTemplate,
+            ObjectMapper objectMapper,
+            @Value("${app.openfoodfacts.user-agent}") String userAgent
+    ) {
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
+        this.userAgent    = userAgent;
+    }
 
     public List<FoodItem> search(String query) {
         String url = UriComponentsBuilder.fromHttpUrl(BASE_URL)
@@ -34,18 +46,27 @@ public class OpenFoodFactsClient {
                 .build()
                 .toUriString();
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.USER_AGENT, userAgent);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
         try {
-            String raw = restTemplate.getForObject(url, String.class);
-            JsonNode root = objectMapper.readTree(raw);
+            log.info("Calling OpenFoodFacts for query '{}'", query);
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url, HttpMethod.GET, entity, String.class
+            );
+            log.info("OpenFoodFacts responded with status {}", response.getStatusCode());
+
+            JsonNode root     = objectMapper.readTree(response.getBody());
             JsonNode products = root.path("products");
+            log.info("OpenFoodFacts returned {} raw products for query '{}'", products.size(), query);
 
             List<FoodItem> results = new ArrayList<>();
             for (JsonNode product : products) {
                 FoodItem item = mapProduct(product);
-                if (item != null) {
-                    results.add(item);
-                }
+                if (item != null) results.add(item);
             }
+            log.info("Mapped {} valid products for query '{}'", results.size(), query);
             return results;
         } catch (Exception e) {
             log.error("OpenFoodFacts search failed for query '{}': {}", query, e.getMessage());
@@ -55,14 +76,13 @@ public class OpenFoodFactsClient {
 
     private FoodItem mapProduct(JsonNode product) {
         String externalId = product.path("code").asText(null);
-        String name = product.path("product_name").asText(null);
+        String name       = product.path("product_name").asText(null);
 
         if (externalId == null || externalId.isBlank() || name == null || name.isBlank()) {
             return null;
         }
 
-        JsonNode n = product.path("nutriments");
-
+        JsonNode n       = product.path("nutriments");
         BigDecimal calories = parseBigDecimal(n, "energy-kcal_100g");
         BigDecimal protein  = parseBigDecimal(n, "proteins_100g");
         BigDecimal carbs    = parseBigDecimal(n, "carbohydrates_100g");
