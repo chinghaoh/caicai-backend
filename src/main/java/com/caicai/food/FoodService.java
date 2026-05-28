@@ -1,9 +1,12 @@
 package com.caicai.food;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.caicai.common.AppException;
+import com.caicai.user.User;
+import com.caicai.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,10 +24,11 @@ public class FoodService {
     private static final String CACHE_PREFIX = "food_search:";
     private static final Duration CACHE_TTL  = Duration.ofHours(24);
 
-    private final FoodItemRepository         foodItemRepository;
+    private final FoodItemRepository          foodItemRepository;
     private final UserFavouriteFoodRepository favouriteRepository;
-    private final OpenFoodFactsClient        offClient;
-    private final StringRedisTemplate        redisTemplate;
+    private final OpenFoodFactsClient         offClient;
+    private final StringRedisTemplate         redisTemplate;
+    private final UserRepository              userRepository;
 
     @Transactional
     public List<FoodDtos.FoodItemResponse> search(String query, Long userId) {
@@ -64,6 +68,37 @@ public class FoodService {
         return ordered.stream()
                 .map(item -> toResponse(item, favouriteIds.contains(item.getId())))
                 .toList();
+    }
+
+    public List<FoodDtos.FoodItemResponse> getFavourites(Long userId) {
+        List<FoodItem> items = favouriteRepository.findFoodItemsByUserId(userId);
+        return items.stream()
+                .map(item -> toResponse(item, true))
+                .toList();
+    }
+
+    @Transactional
+    public void addFavourite(Long foodId, Long userId) {
+        if (favouriteRepository.existsByUserIdAndFoodItemId(userId, foodId)) {
+            return;
+        }
+
+        FoodItem foodItem = foodItemRepository.findById(foodId)
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Food item not found with id: " + foodId));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "User not found"));
+
+        UserFavouriteFood favourite = new UserFavouriteFood(user, foodItem);
+        favouriteRepository.save(favourite);
+    }
+
+    @Transactional
+    public void removeFavourite(Long foodId, Long userId) {
+        if (!favouriteRepository.existsByUserIdAndFoodItemId(userId, foodId)) {
+            throw new AppException(HttpStatus.NOT_FOUND, "Favourite not found");
+        }
+        favouriteRepository.deleteByUserIdAndFoodItemId(userId, foodId);
     }
 
     private boolean isCached(String cacheKey) {

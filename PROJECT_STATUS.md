@@ -89,6 +89,10 @@
 - Food log page loads with empty state + search bar. No preloaded products. Results appear on user input with 300ms debounce. Recent foods (from FoodLog) shown when search is empty — implement in step 11.
 - ObjectMapper and TypeReference were incorrectly included in FoodService imports — removed.
 - @RequiredArgsConstructor dropped from OpenFoodFactsClient — @Value doesn't work with Lombok's generated constructors, switched to manual constructor.
+
+- addFavourite is idempotent — If you favourite something that's already a favourite, nothing happens. No error, no duplicate — it just ignores the request.
+
+
 ---
 
 ## Files Created So Far
@@ -180,7 +184,7 @@ src/main/java/com/caicai/weight/WeightRepository.java
 
 ## Current Task
 
-Step 10  — Favourite foods
+Step 10  — Favourite foods (backend done) frontend is todo
 ---
 
 ## Known Issues / Blockers

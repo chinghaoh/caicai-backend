@@ -28,4 +28,30 @@ public class FoodController {
         List<FoodDtos.FoodItemResponse> results = foodService.search(query.trim(), user.getId());
         return ResponseEntity.ok(Map.of("data", results));
     }
+
+    @GetMapping("/favourites")
+    public ResponseEntity<Map<String, List<FoodDtos.FoodItemResponse>>> getFavourites(
+            @AuthenticationPrincipal User user
+    ) {
+        List<FoodDtos.FoodItemResponse> results = foodService.getFavourites(user.getId());
+        return ResponseEntity.ok(Map.of("data", results));
+    }
+
+    @PostMapping("/{id}/favourite")
+    public ResponseEntity<Map<String, String>> addFavourite(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user
+    ) {
+        foodService.addFavourite(id, user.getId());
+        return ResponseEntity.ok(Map.of("data", "ok"));
+    }
+
+    @DeleteMapping("/{id}/favourite")
+    public ResponseEntity<Void> removeFavourite(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user
+    ) {
+        foodService.removeFavourite(id, user.getId());
+        return ResponseEntity.noContent().build();
+    }
 }
