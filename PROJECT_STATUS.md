@@ -8,7 +8,7 @@
 ## Current Status
 
 **Phase:** started — ready to build  
-**Last updated:** 2026-05-27
+**Last updated:** 2026-05-28 11:12
 
 ---
 
@@ -19,9 +19,9 @@
 [x] 2. Backend entities + repositories
 [x] 3.  GlobalExceptionHandler + AppException
 [x] 4.  Auth backend (register, verify, login, logout, forgot/reset password, demo)
-[ ] 5.  Shared frontend components (ui/)
-[ ] 6.  apiClient + SessionExpiredModal
-[ ] 7.  Auth frontend pages
+[x] 5.  Shared frontend components (ui/)
+[x] 6.  apiClient + SessionExpiredModal
+[x] 7.  Auth frontend pages
 [ ] 8.  Onboarding flow + AI goal suggestion
 [ ] 9.  Food search (OpenFoodFacts + Redis cache)
 [ ] 10. Favourite foods
@@ -38,26 +38,104 @@
 
 ## Decisions Made This Session
 
-_Add any new decisions, deviations from CLAUDE.md, or clarifications here after each session._
+- Added Button and Input to shared ui/ components (not in original CLAUDE.md)
+- Deferred SectionHeader, ErrorMessage, MacroCard, CalorieRing — no immediate use case
+- CalorieRing deferred to step 16 (dashboard)
+- MacroCard deferred to step 11 (food log) where need will be clearer
+- Macro education tooltips added to backlog (implement after step 16)
 
-None yet.
+- App.jsx uses a div wrapper instead of fragment to set bg-bg-page as global background
+- SessionExpiredModal tested and working
+
+- Changed --color-green from #22c55e to #10b981 (less neon, more refined)
+- Removed @import "tailwindcss" from index.css — @tailwindcss/vite plugin handles it automatically
+- Added path alias @ → src/ in vite.config.js
+
+- Added noValidate to all auth forms — browser native validation disabled
+- Fixed apiClient 401 handling — auth endpoints don't trigger SessionExpiredModal
+- Moved json parsing before 401 check in apiClient
+
+- Gender options: Male and Female only (DESIGN.md is correct). Mockup showing "Other" was a reference artefact, not a spec. Onboarding.jsx updated accordingly.
+- Output discipline rule added to CLAUDE.md — one file at a time, stop and wait for confirmation
+- RestTemplate declared as a @Bean in RestTemplateConfig — Spring Boot does not auto-configure it
+- Anthropic API key must be set as environment variable ANTHROPIC_API_KEY and referenced in application.properties as anthropic.api-key=${ANTHROPIC_API_KEY}
 
 ---
 
 ## Files Created So Far
 
 _List every file created, so the next session knows what exists._
+Frontend
 
-None yet.
+src/components/ui/StatCard.jsx
+src/components/ui/PageHeader.jsx
+src/components/ui/EmptyState.jsx
+src/components/ui/FilterPills.jsx
+src/components/ui/Pagination.jsx
+src/components/ui/LoadingSpinner.jsx
+src/components/ui/ProgressBar.jsx
+src/components/ui/MacroBadge.jsx
+src/components/ui/SessionExpiredModal.jsx
+src/components/ui/Input.jsx
+src/components/ui/Button.jsx
+src/apiClient.js
+src/App.jsx
+src/pages/auth/Login.jsx
+src/pages/auth/Register.jsx
+src/pages/auth/ForgotPassword.jsx
+src/pages/auth/ResetPassword.jsx
+
+Backend
+
+src/main/java/com/caicai/auth/AuthController.java
+src/main/java/com/caicai/auth/AuthDtos.java
+src/main/java/com/caicai/auth/AuthService.java
+src/main/java/com/caicai/auth/VerificationToken.java
+src/main/java/com/caicai/auth/VerificationRepository.java
+
+src/main/java/com/caicai/common/AppException.java
+src/main/java/com/caicai/common/GlobalExceptionHandler.java
+
+src/main/java/com/caicai/config/JwtAuthFilter.java
+src/main/java/com/caicai/config/JwtUtil.java
+src/main/java/com/caicai/config/RateLimitFilter.java
+src/main/java/com/caicai/config/RedisConfig.java
+src/main/java/com/caicai/config/SecurityConfig.java
+
+src/main/java/com/caicai/email/EmailService.java
+
+src/main/java/com/caicai/food/FoodItem.java
+src/main/java/com/caicai/food/FoodItemRepository.java
+src/main/java/com/caicai/food/UserFavouriteFood.java
+src/main/java/com/caicai/food/UserFavouriteFoodRepository.java
+
+
+src/main/java/com/caicai/goal/Goal.java
+src/main/java/com/caicai/goal/GoalController.java
+src/main/java/com/caicai/goal/GoalDtos.java
+src/main/java/com/caicai/goal/GoalRepository.java
+src/main/java/com/caicai/goal/GoalService.java
+
+src/main/java/com/caicai/config/RestTemplateConfig.java
+
+src/main/java/com/caicai/log/FoodLog.java
+src/main/java/com/caicai/log/FoodLogRepository.java
+
+src/main/java/com/caicai/user/User.java
+src/main/java/com/caicai/user/UserRepository.java
+
+src/main/java/com/caicai/water/WaterLog.java
+src/main/java/com/caicai/water/WaterRepository.java
+
+src/main/java/com/caicai/weight/WeightLog.java
+src/main/java/com/caicai/weight/WeightRepository.java
+
 
 ---
 
 ## Current Task
 
-_What are you working on right now? Update this at the start of each session._
-
-Not started.
-
+Step 8 — Onboarding flow + AI goal suggestion (backend done, frontend in progress)
 ---
 
 ## Known Issues / Blockers
