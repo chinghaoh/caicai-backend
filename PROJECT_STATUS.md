@@ -24,7 +24,7 @@
 [x] 7.  Auth frontend pages
 [x] 8.  Onboarding flow + AI goal suggestion
 [x] 9.  Food search (OpenFoodFacts + Redis cache)
-[ ] 10. Favourite foods
+[x] 10. Favourite foods
 [ ] 11. Food log
 [ ] 12. Copy day feature
 [ ] 13. Water tracking
@@ -91,8 +91,9 @@
 - @RequiredArgsConstructor dropped from OpenFoodFactsClient — @Value doesn't work with Lombok's generated constructors, switched to manual constructor.
 
 - addFavourite is idempotent — If you favourite something that's already a favourite, nothing happens. No error, no duplicate — it just ignores the request.
+- apiClient is a named export, not default. Always import as: import { apiClient } from '@/apiClient'
 
-
+- apiClient is a named export. Always import as: import { apiClient } from '@/apiClient'. Never use default import.
 ---
 
 ## Files Created So Far
@@ -184,7 +185,7 @@ src/main/java/com/caicai/weight/WeightRepository.java
 
 ## Current Task
 
-Step 10  — Favourite foods (backend done) frontend is todo
+Step 11 — Food log
 ---
 
 ## Known Issues / Blockers
