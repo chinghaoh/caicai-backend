@@ -31,7 +31,7 @@
 [x] 10. Weight tracking backend
 [x] 11. Goals backend (suggest + save)
 [x] 12. Dashboard backend (daily, weekly, monthly)
-[ ] 13. Settings backend (profile, goals)
+[x] 13. Settings backend (profile, goals)
 [ ] 14. Shared frontend components (ui/)
 [ ] 15. apiClient + SessionExpiredModal
 [ ] 16. Auth frontend pages
@@ -115,7 +115,11 @@
 
 - apiClient must handle empty responses (204 No Content) — use response.text() then JSON.parse only if non-empty, otherwise default to {}
 - Never call JSON.stringify on body in components — apiClient handles serialization itself
-= OpenFoodFacts rate limiting is a known issue — try to look for alternative later, cached PostgreSQL data still work
+- OpenFoodFacts rate limiting is a known issue — try to look for alternative later, cached PostgreSQL data still work
+
+- Frontend will be fully rebuilt based on new designs created before starting step 14
+- All backend is complete — do not touch backend during frontend pass unless a bug is found
+- Existing frontend pages (auth, onboarding, food log) will be reviewed and updated to match new designs during the frontend pass
 
 ---
 
@@ -218,12 +222,14 @@ src/main/java/com/caicai/weight/WeightDtos.java
 src/main/java/com/caicai/weight/WeightService.java
 src/main/java/com/caicai/weight/WeightController.java
 
-
+src/main/java/com/caicai/dashboard/DashboardDtos.java
+src/main/java/com/caicai/dashboard/DashboardService.java
+src/main/java/com/caicai/dashboard/DashboardController.java
 ---
 
 ## Current Task
 
-Step 13 — Settings backend (profile, goals)
+Step 14 — Frontend rebuild based on new designs (starting after designs are ready)
 ---
 
 ## Known Issues / Blockers

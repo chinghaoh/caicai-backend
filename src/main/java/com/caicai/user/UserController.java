@@ -1,5 +1,6 @@
 package com.caicai.user;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,5 +25,19 @@ public class UserController {
     public ResponseEntity<Map<String, String>> completeOnboarding(@AuthenticationPrincipal User user) {
         userService.completeOnboarding(user);
         return ResponseEntity.ok(Map.of("message", "Onboarding completed"));
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<Map<String, Object>> updateProfile(
+            @AuthenticationPrincipal User user,
+            @Valid @RequestBody UserDtos.UpdateProfileRequest dto) {
+        UserDtos.UserResponse response = userService.updateProfile(user, dto);
+        return ResponseEntity.ok(Map.of("data", response));
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteAccount(@AuthenticationPrincipal User user) {
+        userService.deleteAccount(user);
+        return ResponseEntity.noContent().build();
     }
 }

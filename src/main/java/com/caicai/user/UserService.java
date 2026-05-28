@@ -18,6 +18,23 @@ public class UserService {
     }
 
     @Transactional
+    public UserDtos.UserResponse updateProfile(User user, UserDtos.UpdateProfileRequest dto) {
+        user.setName(dto.name());
+        user.setAge(dto.age());
+        user.setWeightKg(dto.weightKg());
+        user.setHeightCm(dto.heightCm());
+        user.setGender(dto.gender());
+        user.setActivityLevel(dto.activityLevel());
+        userRepository.save(user);
+        return toUserResponse(user);
+    }
+
+    @Transactional
+    public void deleteAccount(User user) {
+        userRepository.delete(user);
+    }
+
+    @Transactional
     public void completeOnboarding(User user) {
         user.setHasCompletedOnboarding(true);
         userRepository.save(user);
@@ -30,7 +47,12 @@ public class UserService {
                 user.getName(),
                 user.isVerified(),
                 user.isDemo(),
-                user.isHasCompletedOnboarding()
+                user.isHasCompletedOnboarding(),
+                user.getAge(),
+                user.getWeightKg(),
+                user.getHeightCm(),
+                user.getGender() != null ? user.getGender().name() : null,
+                user.getActivityLevel() != null ? user.getActivityLevel().name() : null
         );
     }
 
