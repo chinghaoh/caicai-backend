@@ -28,7 +28,7 @@
 [x] 11. Food log
 [x] 12. Copy day feature
 [x] 9.  Water tracking backend
-[ ] 10. Weight tracking backend
+[x] 10. Weight tracking backend
 [ ] 11. Goals backend (suggest + save)
 [ ] 12. Dashboard backend (daily, weekly, monthly)
 [ ] 13. Settings backend (profile, goals)
@@ -214,13 +214,16 @@ src/main/java/com/caicai/water/WaterController.java
 
 src/main/java/com/caicai/weight/WeightLog.java
 src/main/java/com/caicai/weight/WeightRepository.java
+src/main/java/com/caicai/weight/WeightDtos.java
+src/main/java/com/caicai/weight/WeightService.java
+src/main/java/com/caicai/weight/WeightController.java
 
 
 ---
 
 ## Current Task
 
-Step 10 — weight tracking backend
+Step 11 — Goals backend (suggest + save)
 ---
 
 ## Known Issues / Blockers
