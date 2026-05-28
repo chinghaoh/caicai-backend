@@ -8,7 +8,7 @@
 ## Current Status
 
 **Phase:** started — ready to build  
-**Last updated:** 2026-05-28 15:43
+**Last updated:** 2026-05-28
 
 ---
 
@@ -94,6 +94,15 @@
 - apiClient is a named export, not default. Always import as: import { apiClient } from '@/apiClient'
 
 - apiClient is a named export. Always import as: import { apiClient } from '@/apiClient'. Never use default import.
+  
+- AppException constructor signature is (HttpStatus status, String message) — status first, message second
+- FoodLogResponse includes computed macros (calories, protein, carbs, fat) scaled to amountGrams — avoids client-side calculation
+- loggedAt stored as date.atStartOfDay() — client sends date only, not a full timestamp
+- BigDecimal macro fields must be converted via .doubleValue() before arithmetic in FoodLogService
+- UserService.getIdByEmail(String email) added as a wrapper around userRepository.findByEmail
+
+
+
 ---
 
 ## Files Created So Far
@@ -167,6 +176,9 @@ src/main/java/com/caicai/config/RestTemplateConfig.java
 
 src/main/java/com/caicai/log/FoodLog.java
 src/main/java/com/caicai/log/FoodLogRepository.java
+src/main/java/com/caicai/log/FoodLogDtos.java
+src/main/java/com/caicai/log/FoodLogService.java
+src/main/java/com/caicai/log/FoodLogController.java
 
 src/main/java/com/caicai/user/User.java
 src/main/java/com/caicai/user/UserRepository.java
@@ -185,7 +197,7 @@ src/main/java/com/caicai/weight/WeightRepository.java
 
 ## Current Task
 
-Step 11 — Food log
+Step 11 — Food log (backend done, frontend in progress)
 ---
 
 ## Known Issues / Blockers

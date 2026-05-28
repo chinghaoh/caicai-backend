@@ -1,6 +1,8 @@
 package com.caicai.user;
 
+import com.caicai.common.AppException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,5 +32,11 @@ public class UserService {
                 user.isDemo(),
                 user.isHasCompletedOnboarding()
         );
+    }
+
+    public Long getIdByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "User not found"))
+                .getId();
     }
 }
