@@ -23,7 +23,7 @@
 [x] 6.  apiClient + SessionExpiredModal
 [x] 7.  Auth frontend pages
 [x] 8.  Onboarding flow + AI goal suggestion
-[ ] 9.  Food search (OpenFoodFacts + Redis cache)
+[] 9.  Food search (OpenFoodFacts + Redis cache)
 [ ] 10. Favourite foods
 [ ] 11. Food log
 [ ] 12. Copy day feature
@@ -77,6 +77,10 @@
 - Placeholder /dashboard route added to App.jsx — will be replaced in step 16
 - completeOnboarding() called in AuthContext after save and skip to keep in-memory user state in sync
 
+- Redis is used as a fetch-guard only (presence of key = query already fetched from OpenFoodFacts). Results are always read from PostgreSQL. Not a product cache — PostgreSQL is the result store.
+- Minimum query length of 2 characters enforced in FoodController before hitting the service.
+- FoodDtos.FoodItemResponse includes isFavourite to avoid a second request from the frontend.
+- Result ordering in FoodService: favourites first, then alphabetical. Previously-logged ordering deferred to step 11 when FoodLog queries are available.
 ---
 
 ## Files Created So Far
@@ -132,6 +136,10 @@ src/main/java/com/caicai/food/FoodItem.java
 src/main/java/com/caicai/food/FoodItemRepository.java
 src/main/java/com/caicai/food/UserFavouriteFood.java
 src/main/java/com/caicai/food/UserFavouriteFoodRepository.java
+src/main/java/com/caicai/food/FoodDtos.java
+src/main/java/com/caicai/food/OpenFoodFactsClient.java
+src/main/java/com/caicai/food/FoodService.java
+src/main/java/com/caicai/food/FoodController.java
 
 
 src/main/java/com/caicai/goal/Goal.java
@@ -162,7 +170,7 @@ src/main/java/com/caicai/weight/WeightRepository.java
 
 ## Current Task
 
-Step 9 — Food search (OpenFoodFacts + Redis cache)
+Step 9 — Food search (OpenFoodFacts + Redis cache) — backend only. Frontend (FoodItemCard.jsx) todo
 ---
 
 ## Known Issues / Blockers
