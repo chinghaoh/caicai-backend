@@ -49,7 +49,6 @@ public class FatSecretClient {
             params.put("search_expression", query);
 
             String response = execute(params);
-            log.info("FatSecret raw response: {}", response);
             return parseSearchResults(response);
         } catch (Exception e) {
             log.error("FatSecret search failed for query '{}': {}", query, e.getMessage());

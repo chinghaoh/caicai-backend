@@ -34,6 +34,7 @@ public class DashboardService {
 
     public DashboardDtos.DailySummary getDailySummary(Long userId, LocalDate date) {
         // Food entries
+        log.info("getDailySummary called — userId={}, date={}", userId, date);
         List<FoodLogResponse> entries = List.of();
         try {
             entries = foodLogService.getByDate(userId, date);
