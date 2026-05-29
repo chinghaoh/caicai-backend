@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,12 +22,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FoodService {
 
-    private static final String CACHE_PREFIX = "food_search:";
+    private static final String CACHE_PREFIX = "fatsecret_search:";
     private static final Duration CACHE_TTL  = Duration.ofHours(24);
+    private static final int MAX_RESULTS     = 20;
 
     private final FoodItemRepository          foodItemRepository;
     private final UserFavouriteFoodRepository favouriteRepository;
-    private final OpenFoodFactsClient         offClient;
+    private final FatSecretClient             fatSecretClient;
     private final StringRedisTemplate         redisTemplate;
     private final UserRepository              userRepository;
 
@@ -35,12 +37,13 @@ public class FoodService {
         String cacheKey = CACHE_PREFIX + query.toLowerCase().trim();
 
         if (!isCached(cacheKey)) {
-            List<FoodItem> offResults = offClient.search(query);
-            if (!offResults.isEmpty()) {
-                persistNewItems(offResults);
+            List<FatSecretClient.FatSecretFood> results = fatSecretClient.search(query, MAX_RESULTS);
+
+            if (!results.isEmpty()) {
+                persistNewItems(results);
                 cacheQuery(cacheKey, query);
             } else {
-                log.warn("OpenFoodFacts returned no results for query '{}', skipping cache", query);
+                log.warn("FatSecret returned no results for query '{}', skipping cache", query);
             }
         }
 
@@ -101,20 +104,56 @@ public class FoodService {
         favouriteRepository.deleteByUserIdAndFoodItemId(userId, foodId);
     }
 
-    private boolean isCached(String cacheKey) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(cacheKey));
-    }
+    // --- Private helpers ---
 
-    private void persistNewItems(List<FoodItem> items) {
+    private void persistNewItems(List<FatSecretClient.FatSecretFood> results) {
         int saved = 0;
-        for (FoodItem item : items) {
-            if (item.getExternalId() != null &&
-                    !foodItemRepository.existsByExternalId(item.getExternalId())) {
-                foodItemRepository.save(item);
-                saved++;
+        for (FatSecretClient.FatSecretFood result : results) {
+            if (foodItemRepository.existsByExternalId(result.foodId())) {
+                continue;
             }
+
+            FatSecretClient.FatSecretFood food = result;
+
+            // If search didn't return per-100g data, call food.get for full details
+            if (result.needsDetailCall()) {
+                Optional<FatSecretClient.FatSecretFood> detail = fatSecretClient.getFood(result.foodId());
+                if (detail.isEmpty()) {
+                    log.warn("Skipping food {} — food.get returned no usable data", result.foodId());
+                    continue;
+                }
+                food = detail.get();
+            }
+
+            // Skip if macros are still null after detail call
+            if (food.caloriesPer100g() == null || food.proteinPer100g() == null
+                    || food.carbsPer100g() == null || food.fatPer100g() == null) {
+                log.warn("Skipping food {} — missing required macro data", result.foodId());
+                continue;
+            }
+
+            FoodItem item = FoodItem.builder()
+                    .name(food.name())
+                    .brand(food.brand())
+                    .caloriesPer100g(food.caloriesPer100g())
+                    .proteinPer100g(food.proteinPer100g())
+                    .carbsPer100g(food.carbsPer100g())
+                    .fatPer100g(food.fatPer100g())
+                    .fiberPer100g(food.fiberPer100g())
+                    .sugarPer100g(food.sugarPer100g())
+                    .sodiumPer100g(food.sodiumPer100g())
+                    .source(FoodItem.Source.FATSECRET)
+                    .externalId(result.foodId())
+                    .build();
+
+            foodItemRepository.save(item);
+            saved++;
         }
         log.info("Persisted {} new food items to database", saved);
+    }
+
+    private boolean isCached(String cacheKey) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey(cacheKey));
     }
 
     private void cacheQuery(String cacheKey, String query) {

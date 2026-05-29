@@ -13,8 +13,7 @@ A weight management and nutrition tracking web app. Users log meals, track macro
 - Frontend: React (Vite), Tailwind CSS with custom `@theme` variables, date-fns
 - Infrastructure: AWS EC2, RDS PostgreSQL, ElastiCache Redis, S3 + CloudFront, GitHub Actions CI/CD
 - AI: Anthropic Claude API (goal suggestions only)
-- External API: OpenFoodFacts (food search, cached in Redis + PostgreSQL)
-
+- External API: FatSecret Basic (food search, cached in Redis + PostgreSQL)
 ---
 
 ## Output Discipline
@@ -50,6 +49,10 @@ Before implementing any feature ask yourself:
 7. **Is this transactional?** Any write operation → `@Transactional`
 8. **Could this cause a SQL injection?** Always use `:param` syntax
 9. **Does this throw an exception?** Always use `AppException`, never raw exceptions
+10. **Is this a frontend component or page?** Before writing any frontend code,
+    ask the user to confirm the design. For pages: request a screenshot or
+    description of the desktop layout before starting. Never assume the mobile
+    design scales to desktop automatically.
 
 ---
 
@@ -92,8 +95,6 @@ Never skip steps. Never build out of order.
   (protein, carbs, fat, calories) explaining what it does and why it matters.
   Extensible for when fiber, sodium, and sugar are added to the UI.
   Implement after dashboard is built (step 16).
-- Write backend service tests for all business logic once all backend steps are complete (steps 9–13). 
-  Cover: calorie/macro totals, goal progress calculations, dashboard aggregations, date boundary edge cases, ownership checks.
 
 ---
 
@@ -633,7 +634,7 @@ src/components/ui/
   Button.jsx          ← { children, variant, loading, disabled, fullWidth }
   Input.jsx           ← { label, type, value, onChange, error, placeholder }
   RadioCard.jsx       ← { label, description?, icon?, selected, onClick }
-  FoodItemCard.jsx    ← { food, onAdd } — food name, brand, macro dots (Protein/Carbs/Fat), + button  
+
 ```
 
 Usage examples:
@@ -1087,11 +1088,5 @@ Both repos have GitHub Actions that auto-deploy on push to `main`.
 26. **401 on auth endpoints is a login failure, not session expiry** —
     never trigger SessionExpiredModal on /api/auth/* routes
 27. In IntelliJ, system environment variables are not passed to the JVM automatically —
-        either add them to the run configuration or use raw values in application-local.yml.
-        Never commit raw secrets to git.
-28. **Backend first, frontend second** — build all backend endpoints before any frontend pages. Interleaving them causes rework when API shapes change.
-29. **Never call JSON.stringify on body in apiClient calls** — apiClient handles serialization. Pass raw objects only.
-30. **apiClient must handle empty responses (204 No Content)** — use response.text() then JSON.parse only if non-empty, otherwise default to {}.
-31. **@AuthenticationPrincipal User user in controllers, never UserDetails** — JwtAuthFilter sets principal as User entity. Call user.getId() directly.
-32. **AppException constructor is (HttpStatus, String)** — status first, message second. Never swap them.
-33. **BigDecimal arithmetic requires .doubleValue()** — cannot multiply BigDecimal by double directly.
+    either add them to the run configuration or use raw values in application-local.yml.
+    Never commit raw secrets to git.

@@ -8,7 +8,7 @@
 ## Current Status
 
 **Phase:** started — ready to build  
-**Last updated:** 2026-05-28
+**Last updated:** 2026-05-29
 
 ---
 
@@ -32,18 +32,19 @@
 [x] 11. Goals backend (suggest + save)
 [x] 12. Dashboard backend (daily, weekly, monthly)
 [x] 13. Settings backend (profile, goals)
-[ ] 14. Shared frontend components (ui/)
-[ ] 15. apiClient + SessionExpiredModal
-[ ] 16. Auth frontend pages
-[ ] 17. Onboarding flow + AI goal suggestion frontend
-[ ] 18. Use another food api
-[ ] 19. Food search + Favourite foods frontend
-[ ] 20. Food log + Copy day frontend
-[ ] 21. Water tracking frontend
-[ ] 22. Weight tracking frontend
-[ ] 23. Goals frontend
-[ ] 24. Dashboard frontend
-[ ] 15. Settings frontend
+[x] 14. Shared frontend components — partial (Input, Button, AuthShell, StatCard, PageHeader, EmptyState, FilterPills, FoodItemCard, Pagination, LoadingSpinner, ProgressBar, MacroBadge, RadioCard)
+[x] 15. apiClient + SessionExpiredModal
+[x] 16. Auth frontend pages
+[x] 17. Onboarding frontend
+[x] 18. Layout shell (BottomNav + Sidebar) + remaining shared components
+[x] 19. Use another food API
+[ ] 20. Food search + Favourite foods frontend
+[ ] 21. Food log + Copy day frontend
+[ ] 22. Water tracking frontend
+[ ] 23. Weight tracking frontend
+[ ] 24. Goals frontend
+[ ] 25. Dashboard frontend
+[ ] 26. Settings frontend
 ```
 
 ---
@@ -106,7 +107,7 @@
 - apiClient is a named export, not default. Always import as: import { apiClient } from '@/apiClient'
 
 - apiClient is a named export. Always import as: import { apiClient } from '@/apiClient'. Never use default import.
-  
+
 - AppException constructor signature is (HttpStatus status, String message) — status first, message second
 - FoodLogResponse includes computed macros (calories, protein, carbs, fat) scaled to amountGrams — avoids client-side calculation
 - loggedAt stored as date.atStartOfDay() — client sends date only, not a full timestamp
@@ -122,6 +123,34 @@
 - All backend is complete — do not touch backend during frontend pass unless a bug is found
 - Existing frontend pages (auth, onboarding, food log) will be reviewed and updated to match new designs during the frontend pass
 
+- AuthShell promoted to shared component — used by all 4 auth pages
+- text-2xl font-bold text-green for "Caicai" brand wordmark on auth pages
+- Inline style used for radial gradient (#052e16 → #0f0f0f) — no Tailwind utility covers this
+- Input accepts optional labelAction prop for inline label-row elements
+- PROJECT_STATUS.md summary provided at end of task, not after every file
+
+- Onboarding layout: centered max-w-3xl card, header + progress bar outside card, justify-center on outer div
+- Onboarding background: same radial gradient as AuthShell (radial-gradient(ellipse 80% 60% at 0% 0%, #052e16 0%, #0f0f0f 60%)), applied inline — no separate component yet
+- Onboarding desktop fix was layout-only — no logic changes, all three step files untouched
+
+- /profile — read-only profile page (name, member since, weight progress, nutrition goals, personal details)
+- /settings — account actions only (change email, change password, delete account)
+- Desktop: sidebar user card + name link to /profile. Logout is inline below name in same card.
+- Mobile: MobileHeader avatar links to /profile. Logout lives inside /profile page at the bottom.
+- No /profile/:userId — no social features, revisit if ever scoped
+- Page title removed from Sidebar — pages own their own titles in content area
+- MobileHeader: fixed h-14, pt-14 on main content to clear it
+- UserAvatar component duplicated in Sidebar and MobileHeader — extract to src/components/ui/UserAvatar.jsx during polish pass
+
+- FatSecret Basic tier — OAuth 1.0 HMAC-SHA1, POST to server.api
+- All methods go through BASE_URL — no separate endpoint per method
+- FoodSource enum: OPENFOODFACTS replaced with FATSECRET
+- Search returns Per Xg descriptions — normalized to per 100g using regex + math
+- Foods with non-gram servings (oz, named) call food.get for full serving data
+- Null fiber/sugar/sodium is expected — not all FatSecret entries have micronutrient data
+- Redis fetch-guard prefix updated to fatsecret_search:
+- food_items and related tables truncated — all OpenFoodFacts data wiped
+- FATSECRET_ID and FATSECRET_SECRET env vars required in run config
 ---
 
 ## Files Created So Far
@@ -141,14 +170,23 @@ src/components/ui/MacroBadge.jsx
 src/components/ui/SessionExpiredModal.jsx
 src/components/ui/Input.jsx
 src/components/ui/Button.jsx
+src/components/ui/AuthShell.jsx
+src/components/ui/RadioCard.jsx
+
+
+src/components/layout/BottomNav.jsx
+src/components/layout/Sidebar.jsx
+src/components/layout/AppShell.jsx
+src/components/layout/MobileHeader.js
+
 src/apiClient.js
 src/App.jsx
+
 src/pages/auth/Login.jsx
 src/pages/auth/Register.jsx
 src/pages/auth/ForgotPassword.jsx
 src/pages/auth/ResetPassword.jsx
 
-src/components/ui/RadioCard.jsx
 src/context/AuthContext.jsx
 src/pages/onboarding/Onboarding.jsx
 src/pages/onboarding/StepBasics.jsx
@@ -185,7 +223,7 @@ src/main/java/com/caicai/food/FoodItemRepository.java
 src/main/java/com/caicai/food/UserFavouriteFood.java
 src/main/java/com/caicai/food/UserFavouriteFoodRepository.java
 src/main/java/com/caicai/food/FoodDtos.java
-src/main/java/com/caicai/food/OpenFoodFactsClient.java
+src/main/java/com/caicai/food/FatSecretClient.java
 src/main/java/com/caicai/food/FoodService.java
 src/main/java/com/caicai/food/FoodController.java
 
@@ -230,14 +268,19 @@ src/main/java/com/caicai/dashboard/DashboardController.java
 
 ## Current Task
 
-Step 14 — Frontend rebuild based on new designs (starting after designs are ready)
+Current task: Step 20 — Food search + Favourite foods frontend
 ---
 
 ## Known Issues / Blockers
 
-_Anything broken, unclear, or blocking progress._
+- No reference design exists yet for BottomNav/Sidebar — need to design from scratch based on DESIGN.md spec
+- DESIGN.md says mobile nav: Dashboard | Log | Trends | Goals | Settings (5 items)
+- DESIGN.md says desktop: sidebar, hidden md:flex
+- Active state: white icon + green dot indicator, never full green icon
+- Must confirm desktop sidebar nav labels and icons with user before writing any code
+- Step 18 blocked — user will present nav/sidebar design before any code is written.
+- Do not start Step 18 until design is confirmed.
 
-None.
 
 ---
 
@@ -256,7 +299,7 @@ None.
   (protein, carbs, fat, calories) explaining what it does and why it matters.
   Extensible for when fiber, sodium, and sugar are added to the UI.
   Implement after dashboard is built (step 16).
--  Review all service methods for single point of failure — decide whether to use fault-tolerant try/catch per section (dashboard pattern) 
+-  Review all service methods for single point of failure — decide whether to use fault-tolerant try/catch per section (dashboard pattern)
    or let exceptions propagate (domain endpoints). Document the decision per feature during polish pass.
 ---
 
@@ -266,6 +309,8 @@ None.
 1. Paste CLAUDE.md
 2. Paste this file
 3. Say: "Continue from where we left off. Current task is [X]."
+4. For any frontend task: discuss and confirm the design before writing code.
+   Share reference screenshots if available. Agree on desktop layout explicitly.
 
 **End of session:**
 1. Check off completed bootstrap steps

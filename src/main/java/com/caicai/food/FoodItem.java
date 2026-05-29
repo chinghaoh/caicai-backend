@@ -65,6 +65,6 @@ public class FoodItem {
     }
 
     public enum Source {
-        OPENFOODFACTS, USER_CREATED
+        FATSECRET, USER_CREATED
     }
 }
