@@ -21,11 +21,15 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int redisPort;
 
+    @Value("${spring.data.redis.ssl.enabled:false}")
+    private boolean redisSsl;
+
     @Bean
     public RedisClient redisClient() {
         return RedisClient.create(RedisURI.builder()
                 .withHost(redisHost)
                 .withPort(redisPort)
+                .withSsl(redisSsl)
                 .build());
     }
 
