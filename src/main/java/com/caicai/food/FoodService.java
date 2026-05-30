@@ -104,6 +104,8 @@ public class FoodService {
         favouriteRepository.deleteByUserIdAndFoodItemId(userId, foodId);
     }
 
+
+
     // --- Private helpers ---
 
     private void persistNewItems(List<FatSecretClient.FatSecretFood> results) {

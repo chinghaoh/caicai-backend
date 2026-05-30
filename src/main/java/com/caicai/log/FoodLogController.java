@@ -44,6 +44,14 @@ public class FoodLogController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<FoodLogResponse> update(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id,
+            @Valid @RequestBody FoodLogDtos.UpdateFoodLogRequest dto) {
+        return ResponseEntity.ok(foodLogService.update(user.getId(), id, dto));
+    }
+
     @PostMapping("/copy")
     public ResponseEntity<Void> copyDay(
             @AuthenticationPrincipal User user,

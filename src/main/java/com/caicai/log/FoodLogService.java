@@ -67,6 +67,19 @@ public class FoodLogService {
         foodLogRepository.delete(log);
     }
 
+    @Transactional
+    public FoodLogResponse update(Long userId, Long logId, FoodLogDtos.UpdateFoodLogRequest dto) {
+        FoodLog log = foodLogRepository.findById(logId)
+                .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "Log entry not found"));
+
+        if (!log.getUser().getId().equals(userId)) {
+            throw new AppException(HttpStatus.FORBIDDEN, "Not authorised");
+        }
+
+        log.setAmountGrams(dto.getAmountGrams());
+        return toResponse(log);
+    }
+
     private FoodLogResponse toResponse(FoodLog log) {
         FoodItem food = log.getFoodItem();
         double factor = log.getAmountGrams() / 100.0;

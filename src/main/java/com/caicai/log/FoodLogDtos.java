@@ -54,6 +54,16 @@ public class FoodLogDtos {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class UpdateFoodLogRequest {
+
+        @NotNull(message = "Amount is required")
+        @Min(value = 1, message = "Amount must be at least 1g")
+        private Integer amountGrams;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CopyDayRequest {
         @NotNull(message = "Source date is required")
         private LocalDate sourceDate;

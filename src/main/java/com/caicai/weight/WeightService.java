@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,7 +30,7 @@ public class WeightService {
         WeightLog log = WeightLog.builder()
                 .user(user)
                 .weightKg(dto.getWeightKg())
-                .loggedAt(dto.getDate().atStartOfDay())
+                .loggedAt(LocalDateTime.now())
                 .build();
 
         WeightLog saved = weightLogRepository.save(log);
