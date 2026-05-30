@@ -8,7 +8,7 @@
 ## Current Status
 
 **Phase:** started — ready to build  
-**Last updated:** 2026-05-29
+**Last updated:** 2026-05-30
 
 ---
 
@@ -38,13 +38,20 @@
 [x] 17. Onboarding frontend
 [x] 18. Layout shell (BottomNav + Sidebar) + remaining shared components
 [x] 19. Use another food API
-[ ] 20. Food search + Favourite foods frontend
-[ ] 21. Food log + Copy day frontend
-[ ] 22. Water tracking frontend
-[ ] 23. Weight tracking frontend
-[ ] 24. Goals frontend
-[ ] 25. Dashboard frontend
-[ ] 26. Settings frontend
+[x] 20. Food search + Favourite foods frontend
+[x] 21. Food log + Copy day frontend
+[x] 22. Water tracking frontend
+[x] 23. Weight tracking frontend
+[x] 24. Goals frontend
+[x] 25. Dashboard frontend
+[x] 26. Settings frontend
+[Work in progress]  27. Finish backlog 
+[x] 28.  Create demo
+[x]  29. upload to aws
+[x]  30. setup github actions
+[]  31. work on backlog
+
+
 ```
 
 ---
@@ -140,17 +147,55 @@
 - No /profile/:userId — no social features, revisit if ever scoped
 - Page title removed from Sidebar — pages own their own titles in content area
 - MobileHeader: fixed h-14, pt-14 on main content to clear it
-- UserAvatar component duplicated in Sidebar and MobileHeader — extract to src/components/ui/UserAvatar.jsx during polish pass
+  -UserAvatar component duplicated in Sidebar and MobileHeader — extract to src/components/ui/UserAvatar.jsx during polish pass
 
-- FatSecret Basic tier — OAuth 1.0 HMAC-SHA1, POST to server.api
-- All methods go through BASE_URL — no separate endpoint per method
-- FoodSource enum: OPENFOODFACTS replaced with FATSECRET
-- Search returns Per Xg descriptions — normalized to per 100g using regex + math
-- Foods with non-gram servings (oz, named) call food.get for full serving data
-- Null fiber/sugar/sodium is expected — not all FatSecret entries have micronutrient data
-- Redis fetch-guard prefix updated to fatsecret_search:
-- food_items and related tables truncated — all OpenFoodFacts data wiped
-- FATSECRET_ID and FATSECRET_SECRET env vars required in run config
+-Decision locked: Protein = purple (#a855f7), Water = blue (#3b82f6). Applied everywhere. Never use blue for protein again.
+
+- Steps 20 and 21 merged into a single page — FoodLog.jsx
+- Food Log uses "Logged | Favourites" tab pattern — no stacked sections
+- Custom dark-themed inline calendar date picker — calendar icon next to date label
+- Inline card expansion for logging — no modal, no drawer. Grams input + macro preview appear below the card row
+- Only one card expanded at a time — expanding a second collapses the first
+- Favourites live on the Food Log page as a tab, not a separate route
+- Dashboard calendar heatmap: green = calories within 10% of goal, macro dots as secondary indicators, clicking navigates to /log?date=YYYY-MM-DD — build at step 25
+- Food Log must read date from URL query param when navigating from Dashboard calendar — update at step 25
+- Macro summary strip: mobile = ring centered top + 4 metrics stacked. Desktop = ring left + 4 column grid
+- Water added to macro summary strip — reads from dashboard daily response, no extra API call
+- Nutrient color mapping locked permanently: Calories = green, Protein = purple, Carbs = orange, Fat = yellow, Water = -blue. Never deviate.
+- -color-water and --color-water-bg removed from theme — water uses bg-blue/text-blue
+- -color-bg-page changed from #0f0f0f to #161616 — better separation between page background and cards (#1a1a1
+
+- Dashboard daily summary endpoint is /api/dashboard/summary not /api/dashboard/daily — use this everywhere
+- Vite proxy must be configured — /api → http://localhost:8080. Without it all API calls bypass the proxy
+- DatePicker is a shared component at src/components/ui/DatePicker.jsx — uses parseISO from date-fns, smart up/down positioning
+- Food Log split into 4 files: FoodLog.jsx (page), ExpandableFoodCard.jsx, LoggedEntry.jsx, DatePicker.jsx
+- ExpandableFoodCard has meal selector + date text input (dd/mm/yyyy) — date only affects that log entry, not the page
+- CalorieRing rounds to whole numbers — backend returns doubles
+- Mobile CalorieRing size: 140px. Desktop: 100px
+
+- Steps 23, 24, 25 merged — Weight + Goals + Dashboard are one page at /dashboard
+- Goals nav item removed — nav is now Dashboard | Log | Trends | Settings (4 items)
+- CalorieRing shows calories consumed tracking up toward goal, label is "KCAL" not "KCAL LEFT"
+- Dashboard split into 4 files: Dashboard.jsx, MacroCard.jsx, WeightSection.jsx, WeightChart.jsx
+- MacroCard lives in src/pages/dashboard/ — not promoted to shared ui/
+- Weight change color is goal-aware — green = toward goal, red = away from goal
+- WeightService.java stores LocalDateTime.now() instead of date.atStartOfDay() — fixes same-day sort order
+- Weight chart uses last 30 days, averaged per day — multiple logs per day collapse to one point
+- Weight history table shows all entries, paginated at 5 per page
+- ChangeLabel and build30DayChartData defined outside component to avoid hydration errors
+- max-w-4xl removed from Dashboard — full width
+
+- /profile route removed — Sidebar and MobileHeader avatar both link to /settings
+- Settings has 3 tabs: Profile / Goals / Account
+- /settings?tab=goals — URL param drives active tab, "Update Goals" on Dashboard navigates here
+- No inline password change — Account tab sends forgot-password email instead
+- Ai suggestion = coming soon placeholder for now
+
+- EC2 security group must have explicit IPv4 rule for port 8080 — the console defaulted to IPv6 only
+- Elastic IP assigned to EC2 for stable routing
+- RedisConfig.java updated to use spring.data.redis.ssl.enabled property for conditional TLS
+- CloudFront error pages: 403 and 404 → index.html with 200 (SPA routing fix)
+- Frontend built with VITE_API_URL env var set to CloudFront domain
 ---
 
 ## Files Created So Far
@@ -172,12 +217,16 @@ src/components/ui/Input.jsx
 src/components/ui/Button.jsx
 src/components/ui/AuthShell.jsx
 src/components/ui/RadioCard.jsx
+src/components/ui/CalorieRing.jsx
+src/components/ui/DatePicker.jsx
 
 
 src/components/layout/BottomNav.jsx
 src/components/layout/Sidebar.jsx
 src/components/layout/AppShell.jsx
 src/components/layout/MobileHeader.js
+
+src/components/water/WaterModal.jsx
 
 src/apiClient.js
 src/App.jsx
@@ -194,10 +243,19 @@ src/pages/onboarding/StepGoals.jsx
 src/pages/onboarding/StepSuggestion.jsx
 
 
-src/pages/food-log/FoodLogView.jsx
-src/pages/food-log/FoodLogTable.jsx
-src/pages/food-log/FoodLogCard.jsx
+src/pages/food-log/ExpandableFoodCard.jsx
+src/pages/food-log/LoggedEntry.jsx
 src/pages/food-log/FoodLog.jsx
+
+src/pages/dashboard/Dashboard.jsx
+src/pages/dashboard/MacroCard.jsx
+src/pages/dashboard/WeightSection.jsx
+src/pages/dashboard/WeightChart.jsx
+
+src/pages/settings/Settings.jsx
+src/pages/settings/ProfileTab.jsx
+src/pages/settings/GoalsTab.jsx
+src/pages/settings/AccountTab.jsx
 
 Backend
 
@@ -223,7 +281,7 @@ src/main/java/com/caicai/food/FoodItemRepository.java
 src/main/java/com/caicai/food/UserFavouriteFood.java
 src/main/java/com/caicai/food/UserFavouriteFoodRepository.java
 src/main/java/com/caicai/food/FoodDtos.java
-src/main/java/com/caicai/food/FatSecretClient.java
+src/main/java/com/caicai/food/OpenFoodFactsClient.java
 src/main/java/com/caicai/food/FoodService.java
 src/main/java/com/caicai/food/FoodController.java
 
@@ -268,39 +326,28 @@ src/main/java/com/caicai/dashboard/DashboardController.java
 
 ## Current Task
 
-Current task: Step 20 — Food search + Favourite foods frontend
+Step 31 work on backlog
+
 ---
 
 ## Known Issues / Blockers
 
-- No reference design exists yet for BottomNav/Sidebar — need to design from scratch based on DESIGN.md spec
-- DESIGN.md says mobile nav: Dashboard | Log | Trends | Goals | Settings (5 items)
-- DESIGN.md says desktop: sidebar, hidden md:flex
-- Active state: white icon + green dot indicator, never full green icon
-- Must confirm desktop sidebar nav labels and icons with user before writing any code
-- Step 18 blocked — user will present nav/sidebar design before any code is written.
-- Do not start Step 18 until design is confirmed.
+- Food Log must read date from URL query param when navigating from Dashboard calendar — update at step 25
+- FoodLogView.jsx, FoodLogTable.jsx, FoodLogCard.jsx are superseded by FoodLog.jsx — remove from repo
 
 
 ---
 
 ## Backlog
-- Edit food log entry — PUT /api/food-logs/{id}, change amountGrams and mealType. Frontend: edit modal. Implement during polish pass.
-- OpenFoodFacts replacement — find alternative food data API. Cached PostgreSQL data works in the meantime.
-- Need to rethink our current designs after the whole frontend has been implemented
-- Write backend service tests for all business logic once all backend steps are complete (steps 9–13).
-  Cover: calorie/macro totals, goal progress calculations, dashboard aggregations, date boundary edge cases, ownership checks.
-- AI food recommendations — suggest foods to user based on remaining
-  daily macro goals. Implement after dashboard is built (step 16).
-- Structured logging — add log levels and correlation IDs to make
-  debugging production issues easier. Implement before first
-  production deployment.
+- AI goal re-suggestion from within the app
+- AI food recommendations based on remaining daily macros
 - Macro education tooltips — show a small info popup on each macro
   (protein, carbs, fat, calories) explaining what it does and why it matters.
   Extensible for when fiber, sodium, and sugar are added to the UI.
   Implement after dashboard is built (step 16).
 -  Review all service methods for single point of failure — decide whether to use fault-tolerant try/catch per section (dashboard pattern)
    or let exceptions propagate (domain endpoints). Document the decision per feature during polish pass.
+- Edit email in the settings
 ---
 
 ## How To Use This File

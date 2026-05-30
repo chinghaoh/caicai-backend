@@ -14,6 +14,7 @@ A weight management and nutrition tracking web app. Users log meals, track macro
 - Infrastructure: AWS EC2, RDS PostgreSQL, ElastiCache Redis, S3 + CloudFront, GitHub Actions CI/CD
 - AI: Anthropic Claude API (goal suggestions only)
 - External API: FatSecret Basic (food search, cached in Redis + PostgreSQL)
+
 ---
 
 ## Output Discipline
@@ -61,40 +62,55 @@ Before implementing any feature ask yourself:
 Never skip steps. Never build out of order.
 
 ```
-1.  Database migrations (all tables first)
+1.  Database migrations
 2.  Backend entities + repositories
-3.  GlobalExceptionHandler + AppException (before any service)
+3.  GlobalExceptionHandler + AppException
 4.  Auth backend (register, verify, login, logout, forgot/reset password, demo)
 5.  Shared frontend components (ui/)
 6.  apiClient + SessionExpiredModal
-7.  Auth frontend pages (register, login, forgot password, reset password)
+7.  Auth frontend pages
 8.  Onboarding flow + AI goal suggestion
-9.  Food search (OpenFoodFacts integration + Redis cache)
+9.  Food search (FatSecret + Redis cache)
 10. Favourite foods
-11. Food log (core feature)
+11. Food log
 12. Copy day feature
-13. Water tracking
-14. Weight tracking
-15. Goals (current, history)
-16. Dashboard (daily, weekly, monthly)
-17. Settings (profile, goals)
+13. Water tracking backend
+14. Weight tracking backend
+15. Goals backend (suggest + save)
+16. Dashboard backend (daily, weekly, monthly)
+17. Settings backend (profile, goals)
+18. Shared frontend components — partial (Input, Button, AuthShell, StatCard, PageHeader, EmptyState, FilterPills, FoodItemCard, Pagination, LoadingSpinner, ProgressBar, MacroBadge, RadioCard)
+19. apiClient + SessionExpiredModal
+20. Auth frontend pages
+21. Onboarding frontend
+22. Layout shell (BottomNav + Sidebar) + remaining shared components
+23. Use another food API
+24. Food search + Favourite foods frontend
+25. Food log + Copy day frontend
+26. Water tracking frontend
+27. Weight tracking frontend
+28. Goals frontend
+29. Dashboard frontend
+30. Settings frontend
+31. Finish backlog
+32. Create tests
+33. Upload to AWS
+34. setup github actions
 ```
 
 ---
 
 ## Backlog
 
-- Food search results ordering — favourites first, previously logged second,
-  rest alphabetically. Implement in FoodService when building step 9.
-- AI food recommendations — suggest foods to user based on remaining
-  daily macro goals. Implement after dashboard is built (step 16).
-- Structured logging — add log levels and correlation IDs to make
-  debugging production issues easier. Implement before first
-  production deployment.
+- AI goal re-suggestion from within the app
+- AI food recommendations based on remaining daily macros
 - Macro education tooltips — show a small info popup on each macro
   (protein, carbs, fat, calories) explaining what it does and why it matters.
   Extensible for when fiber, sodium, and sugar are added to the UI.
   Implement after dashboard is built (step 16).
+-  Review all service methods for single point of failure — decide whether to use fault-tolerant try/catch per section (dashboard pattern)
+   or let exceptions propagate (domain endpoints). Document the decision per feature during polish pass.
+- Edit email in the settings
 
 ---
 
@@ -102,7 +118,7 @@ Never skip steps. Never build out of order.
 
 ```
 User
-├── FoodItem            (OpenFoodFacts cached + user created)
+├── FoodItem            (FatSecret cached + user created)
 ├── FoodLog             (userId, foodItemId, amountGrams, mealType, loggedAt)
 ├── WaterLog            (userId, amountMl, loggedAt)
 ├── WeightLog           (userId, weightKg, loggedAt)
@@ -122,9 +138,9 @@ isVerified, isDemo, createdAt
 id, name, brand,
 caloriesPer100g, proteinPer100g, carbsPer100g, fatPer100g,
 fiberPer100g, sugarPer100g, sodiumPer100g,
-source,        // OPENFOODFACTS | USER_CREATED
-externalId,    // OpenFoodFacts barcode/id, nullable
-createdBy,     // userId, nullable for OpenFoodFacts items
+source,        // FatSecret | USER_CREATED
+externalId,    // FatSecret barcode/id, nullable
+createdBy,     // userId, nullable for FatSecret items
 createdAt
 ```
 
@@ -368,7 +384,7 @@ GET /api/dashboard/monthly?date=2024-01-15
 
 ## Food Search Flow
 
-Live search with debounce + Redis cache. Never call OpenFoodFacts on every keystroke.
+Live search with debounce + Redis cache. Never call FatSecret on every keystroke.
 
 ```
 Frontend:
@@ -377,7 +393,7 @@ Frontend:
 Backend:
   1. Check Redis cache for query key
   2. Cache hit → return immediately
-  3. Cache miss → query OpenFoodFacts API
+  3. Cache miss → query FatSecret API
   4. Store results in Redis (TTL: 24 hours)
   5. Store new FoodItems in PostgreSQL
   6. Return results
@@ -388,7 +404,7 @@ Backend:
 **Search result ordering:**
 1. User's favourite foods that match the query (top)
 2. Previously logged foods that match the query
-3. OpenFoodFacts / cached results
+3. FatSecret / cached results
 
 ---
 
@@ -573,7 +589,7 @@ Never optimize prematurely. If there's no evidence of a problem, don't solve it.
   --color-red-bg:        #450a0a;
   --color-purple:        #a855f7;
   --color-purple-bg:     #2e1065;
-  --color-bg-page:       #0f0f0f;
+  --color-bg-page:       #161616;
   --color-bg-card:       #1a1a1a;
   --color-bg-input:      #242424;
   --color-border:        #2e2e2e;
@@ -653,18 +669,14 @@ Usage examples:
 pages/
   dashboard/
     Dashboard.jsx
+    MacroCard.jsx
+    WeightSection.jsx
+    WeightChart.jsx
   food-log/
     FoodLog.jsx
-    FoodLogView.jsx
-    FoodLogTable.jsx
-    FoodLogCard.jsx
-  water/
-    Water.jsx
-    WaterView.jsx
-    WaterCard.jsx
-  goals/
-    Goals.jsx
-    GoalHistory.jsx
+    ExpandableFoodCard.jsx
+    LoggedEntry.jsx
+    DatePicker.jsx
   onboarding/
     Onboarding.jsx
     StepBasics.jsx
@@ -672,6 +684,11 @@ pages/
     StepSuggestion.jsx
   settings/
     Settings.jsx
+    ProfileTab.jsx
+    GoalsTab.jsx
+    AccountTab.jsx
+  ai/
+    AISuggest.jsx  ← placeholder, not yet built
 ```
 
 ### Container/Presentational (strict)
@@ -947,21 +964,21 @@ Never add a Redis health check that degrades gracefully locally. If Redis is dow
 
 Secure cookies only transmit over HTTPS. Production runs over HTTPS via CloudFront. Local runs over HTTP. If `APP_COOKIE_SECURE=true` locally, auth silently breaks — cookies are set but never sent. Always verify this flag when debugging auth issues locally.
 
-### OpenFoodFacts — Graceful Degradation
-If OpenFoodFacts is unreachable (down, slow, or rate limited):
+### FatSecret — Graceful Degradation
+If FatSecret is unreachable (down, slow, or rate limited):
 - Return whatever exists in Redis cache or PostgreSQL
 - Never throw a 500 — return empty results gracefully
 - Log the failure server-side with the error details
 - Never block the user from logging food they've searched before
 
 ```java
-// Wrap OpenFoodFacts call specifically — not a general catch-all
+// Wrap FatSecret call specifically — not a general catch-all
 try {
-    results = openFoodFactsClient.search(query);
+    results = FatSecretClient.search(query);
     cacheResults(query, results);
     saveNewItems(results);
 } catch (Exception e) {
-    log.warn("OpenFoodFacts unreachable for query '{}': {}", query, e.getMessage());
+    log.warn("FatSecret unreachable for query '{}': {}", query, e.getMessage());
     // fall through — return cached results only
 }
 return getCachedResults(query);
@@ -1081,7 +1098,7 @@ Both repos have GitHub Actions that auto-deploy on push to `main`.
 20. **Food search debounce is 300ms** — never fire on every keystroke
 21. **Redis is required locally** — app fails fast without it, never mock it
 22. **`APP_COOKIE_SECURE=false` locally** — secure cookies over HTTP silently breaks auth
-23. **OpenFoodFacts failures are non-fatal** — catch specifically, log, return cached results
+23. **FatSecret failures are non-fatal** — catch specifically, log, return cached results
 24. **Hibernate naming strategy doesn't handle numbers correctly** — caloriesPer100g becomes calories_per100g not   
     calories_per_100g. Always use explicit @Column(name = "...") for fields with numbers in the name.
 25. **To view live logs on EC2 : ssh into instance and run `tail -f ~/app.log`** . Always check logs before assuming production is broken.
@@ -1090,3 +1107,8 @@ Both repos have GitHub Actions that auto-deploy on push to `main`.
 27. In IntelliJ, system environment variables are not passed to the JVM automatically —
     either add them to the run configuration or use raw values in application-local.yml.
     Never commit raw secrets to git.
+28. apiClient unwraps the envelope automatically — never do res.data in components, use res directly
+29. WeightService stores LocalDateTime.now() not date.atStartOfDay() — same-day entries need real timestamps for correct sort order
+30. CalorieRing shows consumed tracking up toward goal — not remaining
+31. Dashboard fetches summary and weight independently — weight failure is non-fatal
+32. ChangeLabel color is goal-aware — green = toward goal, red = away from goal regardless of direction
