@@ -29,9 +29,9 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "target/gymlog-0.0.1-SNAPSHOT.jar"
+          source: "caicai-backend/target/caicai-0.0.1-SNAPSHOT.jar"
           target: "/home/ec2-user/"
-          strip_components: 1
+          strip_components: 2
 
       - name: Restart Spring Boot
         uses: appleboy/ssh-action@master
