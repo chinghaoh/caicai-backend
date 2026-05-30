@@ -29,9 +29,9 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "caicai-backend/target/caicai-0.0.1-SNAPSHOT.jar"
+          source: "target/caicai-0.0.1-SNAPSHOT.jar"
           target: "/home/ec2-user/"
-          strip_components: 2
+          strip_components: 1
 
       - name: Restart Spring Boot
         uses: appleboy/ssh-action@master
@@ -43,7 +43,7 @@ jobs:
             source ~/.env
             pkill java || true
             sleep 2
-            nohup java -jar /home/ec2-user/gymlog-0.0.1-SNAPSHOT.jar > /home/ec2-user/app.log 2>&1 &
+            nohup java -jar /home/ec2-user/caicai-0.0.1-SNAPSHOT.jar > /home/ec2-user/app.log 2>&1 &
             echo "Waiting for startup..."
             sleep 15
             curl -f http://localhost:8080/actuator/health && echo "✓ App is up" || echo "✗ App failed to start"
