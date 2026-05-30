@@ -50,3 +50,9 @@ app:
   fatsecret:
     id: ${FATSECRET_ID}
     secret: ${FATSECRET_SECRET}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
