@@ -27,10 +27,14 @@ public class WeightService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(HttpStatus.NOT_FOUND, "User not found"));
 
+        LocalDateTime loggedAt = dto.getDate().equals(LocalDate.now())
+                ? LocalDateTime.now()
+                : dto.getDate().atStartOfDay();
+
         WeightLog log = WeightLog.builder()
                 .user(user)
                 .weightKg(dto.getWeightKg())
-                .loggedAt(LocalDateTime.now())
+                .loggedAt(loggedAt)
                 .build();
 
         WeightLog saved = weightLogRepository.save(log);
