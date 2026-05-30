@@ -43,20 +43,25 @@ public class RateLimitFilter extends OncePerRequestFilter {
         String clientIp = getClientIp(request);
         String bucketKey = "rate_limit:" + uri + ":" + clientIp;
 
-        BucketConfiguration config = buildConfig(uri);
-        Supplier<BucketConfiguration> configSupplier = () -> config;
-        Bucket bucket = proxyManager.builder().build(bucketKey, configSupplier);
+        try {
+            BucketConfiguration config = buildConfig(uri);
+            Supplier<BucketConfiguration> configSupplier = () -> config;
+            Bucket bucket = proxyManager.builder().build(bucketKey, configSupplier);
 
-        if (bucket.tryConsume(1)) {
+            if (bucket.tryConsume(1)) {
+                filterChain.doFilter(request, response);
+            } else {
+                log.warn("Rate limit exceeded for IP: {} on URI: {}", clientIp, uri);
+                response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                objectMapper.writeValue(response.getWriter(), Map.of(
+                        "status", 429,
+                        "message", "Too many requests. Please try again later."
+                ));
+            }
+        } catch (Exception e) {
+            log.warn("Rate limiting unavailable (Redis unreachable), failing open for: {}", uri);
             filterChain.doFilter(request, response);
-        } else {
-            log.warn("Rate limit exceeded for IP: {} on URI: {}", clientIp, uri);
-            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            objectMapper.writeValue(response.getWriter(), Map.of(
-                    "status", 429,
-                    "message", "Too many requests. Please try again later."
-            ));
         }
     }
 
@@ -71,6 +76,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
             case "/api/auth/reset-password"  -> { capacity = 5;   duration = Duration.ofMinutes(10); }
             case "/api/auth/verify"          -> { capacity = 5;   duration = Duration.ofMinutes(10); }
             case "/api/auth/demo"            -> { capacity = 3;   duration = Duration.ofMinutes(10); }
+            case "/api/goals/suggest"        -> { capacity = 5;   duration = Duration.ofMinutes(10); }
             default                          -> { capacity = 100; duration = Duration.ofMinutes(1); }
         }
 
