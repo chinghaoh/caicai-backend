@@ -25,4 +25,14 @@ public class DemoCleanupScheduler {
             log.info("Cleaned up {} expired demo users", deleted);
         }
     }
+
+    @Scheduled(fixedRate = 60 * 60 * 1000)
+    @Transactional
+    public void cleanupUnverifiedUsers() {
+        LocalDateTime cutoff = LocalDateTime.now().minusHours(24);
+        int deleted = userRepository.deleteByVerifiedFalseAndDemoFalseAndCreatedAtBefore(cutoff);
+        if (deleted > 0) {
+            log.info("Cleaned up {} unverified accounts", deleted);
+        }
+    }
 }

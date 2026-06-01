@@ -19,4 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("DELETE FROM User u WHERE u.demo = true AND u.createdAt < :cutoff")
     int deleteByIsDemoTrueAndCreatedAtBefore(@Param("cutoff") LocalDateTime cutoff);
+
+    int deleteByVerifiedFalseAndDemoFalseAndCreatedAtBefore(LocalDateTime cutoff);
+
 }
