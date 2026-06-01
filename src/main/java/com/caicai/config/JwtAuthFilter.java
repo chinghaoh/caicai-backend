@@ -34,6 +34,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             Long userId = jwtUtil.extractUserId(token);
 
             userRepository.findById(userId).ifPresent(user -> {
+                if (!user.isVerified()) return;
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 user,
