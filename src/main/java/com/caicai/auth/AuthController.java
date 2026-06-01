@@ -5,7 +5,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.Map;
 
@@ -23,13 +22,9 @@ public class AuthController {
     }
 
     @GetMapping("/verify")
-    public RedirectView verify(
-            @RequestParam String token,
-            HttpServletResponse response) {
-
-        authService.verify(token, response);
-
-        return new RedirectView("http://localhost:5173/login");
+    public ResponseEntity<Map<String, Object>> verify(@RequestParam String token, HttpServletResponse response) {
+        AuthDtos.AuthResponse authResponse = authService.verify(token, response);
+        return ResponseEntity.ok(Map.of("data", authResponse));
     }
 
     @PostMapping("/login")
