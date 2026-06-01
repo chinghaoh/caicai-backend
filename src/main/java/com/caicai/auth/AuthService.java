@@ -57,7 +57,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void verify(String token) {
+    public AuthDtos.AuthResponse verify(String token, HttpServletResponse response) {
         VerificationToken verificationToken = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, "Invalid verification token"));
 
@@ -79,6 +79,8 @@ public class AuthService {
 
         verificationToken.setUsedAt(LocalDateTime.now());
         tokenRepository.save(verificationToken);
+
+        return toAuthResponse(user);
     }
 
     @Transactional
