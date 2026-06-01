@@ -21,7 +21,7 @@ public class EmailService {
     private String fromEmail;
 
     public void sendVerificationEmail(String toEmail, String token) {
-        String link = frontendUrl + "/verify?token=" + token;
+        String link = frontendUrl + "/api/auth/verify?token=" + token;
         sendEmail(
                 toEmail,
                 "Verify your Caicai account",
