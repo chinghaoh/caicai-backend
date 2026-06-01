@@ -22,9 +22,9 @@ public class AuthController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<Map<String, Object>> verify(@RequestParam String token, HttpServletResponse response) {
-        AuthDtos.AuthResponse authResponse = authService.verify(token, response);
-        return ResponseEntity.ok(Map.of("data", authResponse));
+    public ResponseEntity<Map<String, String>> verify(@RequestParam String token) {
+        authService.verify(token);
+        return ResponseEntity.ok(Map.of("message", "Email verified successfully"));
     }
 
     @PostMapping("/login")
