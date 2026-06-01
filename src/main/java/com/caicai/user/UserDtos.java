@@ -30,12 +30,12 @@ public class UserDtos {
 
             @NotNull(message = "Weight is required")
             @DecimalMin(value = "20.0", message = "Weight must be at least 20kg")
-            @DecimalMax(value = "500.0", message = "Weight must be at most 500kg")
+            @DecimalMax(value = "300.0", message = "Weight must be at most 300kg")
             BigDecimal weightKg,
 
             @NotNull(message = "Height is required")
             @Min(value = 50, message = "Height must be at least 50cm")
-            @Max(value = 300, message = "Height must be at most 300cm")
+            @Max(value = 220, message = "Height must be at most 220cm")
             BigDecimal heightCm,
 
             @NotNull(message = "Gender is required")

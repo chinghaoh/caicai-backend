@@ -14,12 +14,12 @@ public class GoalDtos {
 
             @NotNull(message = "Weight is required")
             @DecimalMin(value = "20.0", message = "Weight must be at least 20 kg")
-            @DecimalMax(value = "500.0", message = "Weight must be at most 500 kg")
+            @DecimalMax(value = "300.0", message = "Weight must be at most 300kg")
             BigDecimal weightKg,
 
             @NotNull(message = "Height is required")
             @Min(value = 50, message = "Height must be at least 50 cm")
-            @Max(value = 300, message = "Height must be at most 300 cm")
+            @Max(value = 220, message = "Height must be at most 220cm")
             Integer heightCm,
 
             @NotBlank(message = "Gender is required")
@@ -33,7 +33,7 @@ public class GoalDtos {
 
             @NotNull(message = "Target weight is required")
             @DecimalMin(value = "20.0", message = "Target weight must be at least 20 kg")
-            @DecimalMax(value = "500.0", message = "Target weight must be at most 500 kg")
+            @DecimalMax(value = "300.0", message = "Target Weight can be at most 300kg")
             BigDecimal targetWeightKg
     ) {}
 
