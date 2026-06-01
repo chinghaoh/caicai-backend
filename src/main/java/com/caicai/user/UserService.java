@@ -19,12 +19,12 @@ public class UserService {
 
     @Transactional
     public UserDtos.UserResponse updateProfile(User user, UserDtos.UpdateProfileRequest dto) {
-        user.setName(dto.name());
-        user.setAge(dto.age());
-        user.setWeightKg(dto.weightKg());
-        user.setHeightCm(dto.heightCm());
-        user.setGender(dto.gender());
-        user.setActivityLevel(dto.activityLevel());
+        if (dto.name() != null)          user.setName(dto.name());
+        if (dto.age() != null)           user.setAge(dto.age());
+        if (dto.weightKg() != null)      user.setWeightKg(dto.weightKg());
+        if (dto.heightCm() != null)      user.setHeightCm(dto.heightCm());
+        if (dto.gender() != null)        user.setGender(dto.gender());
+        if (dto.activityLevel() != null) user.setActivityLevel(dto.activityLevel());
         userRepository.save(user);
         return toUserResponse(user);
     }

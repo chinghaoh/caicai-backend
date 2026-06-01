@@ -27,7 +27,7 @@ public class UserController {
         return ResponseEntity.ok(Map.of("message", "Onboarding completed"));
     }
 
-    @PutMapping("/me")
+    @PatchMapping("/me")
     public ResponseEntity<Map<String, Object>> updateProfile(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody UserDtos.UpdateProfileRequest dto) {
