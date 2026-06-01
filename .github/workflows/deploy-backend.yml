@@ -21,7 +21,10 @@ jobs:
       - name: Build JAR
         run: |
           chmod +x ./mvnw
-          ./mvnw clean package -DskipTests
+          ./mvnw clean package -U
+
+      - name: Verify JAR
+        run: ls -la target/caicai-0.0.1-SNAPSHOT.jar
 
       - name: Upload JAR to EC2
         uses: appleboy/scp-action@master
@@ -42,8 +45,8 @@ jobs:
           script: |
             source ~/.env
             pkill java || true
-            sleep 2
+            sleep 5
             nohup java -jar /home/ec2-user/caicai-0.0.1-SNAPSHOT.jar > /home/ec2-user/app.log 2>&1 &
             echo "Waiting for startup..."
-            sleep 15
+            sleep 20
             curl -f http://localhost:8080/actuator/health && echo "✓ App is up" || echo "✗ App failed to start"
