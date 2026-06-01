@@ -80,7 +80,6 @@ public class AuthService {
         verificationToken.setUsedAt(LocalDateTime.now());
         tokenRepository.save(verificationToken);
 
-        setJwtCookie(response, jwtUtil.generateToken(user.getId()));
         return toAuthResponse(user);
     }
 
