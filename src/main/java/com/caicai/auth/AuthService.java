@@ -46,8 +46,8 @@ public class AuthService {
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .name(request.name())
-                .isVerified(false)
-                .isDemo(false)
+                .verified(false)
+                .demo(false)
                 .build();
 
         userRepository.save(user);
@@ -57,7 +57,7 @@ public class AuthService {
     }
 
     @Transactional
-    public AuthDtos.AuthResponse verify(String token) {
+    public void verify(String token) {
         VerificationToken verificationToken = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new AppException(HttpStatus.BAD_REQUEST, "Invalid verification token"));
 
@@ -79,8 +79,6 @@ public class AuthService {
 
         verificationToken.setUsedAt(LocalDateTime.now());
         tokenRepository.save(verificationToken);
-
-        return toAuthResponse(user);
     }
 
     @Transactional
@@ -92,7 +90,6 @@ public class AuthService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new AppException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
 
-        log.info("Login attempt — user: {}, isVerified: {}", user.getEmail(), user.isVerified());
         if (!user.isVerified()) {
             throw new AppException(HttpStatus.FORBIDDEN, "Please verify your email before logging in");
         }
@@ -151,8 +148,8 @@ public class AuthService {
                 .email(demoEmail)
                 .password(passwordEncoder.encode(UUID.randomUUID().toString()))
                 .name("Demo User")
-                .isVerified(true)
-                .isDemo(true)
+                .verified(true)
+                .demo(true)
                 .hasCompletedOnboarding(false)
                 .build();
 
@@ -179,7 +176,7 @@ public class AuthService {
         cookie.setHttpOnly(true);
         cookie.setSecure(cookieSecure);
         cookie.setPath("/");
-        cookie.setMaxAge(86400); // 24 hours
+        cookie.setMaxAge(86400);
         response.addCookie(cookie);
     }
 

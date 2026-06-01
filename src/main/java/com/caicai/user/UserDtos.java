@@ -9,12 +9,12 @@ public class UserDtos {
             Long id,
             String email,
             String name,
-            boolean isVerified,
-            boolean isDemo,
+            boolean verified,
+            boolean demo,
             boolean hasCompletedOnboarding,
             Integer age,
             BigDecimal weightKg,
-            BigDecimal  heightCm,
+            BigDecimal heightCm,
             String gender,
             String activityLevel
     ) {}

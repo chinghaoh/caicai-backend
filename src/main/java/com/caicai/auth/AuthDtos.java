@@ -53,8 +53,8 @@ public class AuthDtos {
             Long id,
             String email,
             String name,
-            boolean isVerified,
-            boolean isDemo,
+            boolean verified,
+            boolean demo,
             boolean hasCompletedOnboarding
     ) {}
 }

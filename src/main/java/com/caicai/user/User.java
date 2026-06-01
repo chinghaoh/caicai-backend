@@ -42,11 +42,11 @@ public class User {
     @Enumerated(EnumType.STRING)
     private ActivityLevel activityLevel;
 
-    @Column(nullable = false)
-    private boolean isVerified = false;
+    @Column(name = "is_verified", nullable = false)
+    private boolean verified = false;
 
-    @Column(nullable = false)
-    private boolean isDemo = false;
+    @Column(name = "is_demo", nullable = false)
+    private boolean demo = false;
 
     @Column(nullable = false)
     private boolean hasCompletedOnboarding = false;
