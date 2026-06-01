@@ -93,7 +93,7 @@ public class AuthService {
                 .orElseThrow(() -> new AppException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
 
         if (!user.isVerified()) {
-            throw new AppException(HttpStatus.FORBIDDEN, "Please verify your email before logging in");
+            throw new AppException(HttpStatus.UNAUTHORIZED, "Please verify your email before logging in");
         }
 
         setJwtCookie(response, jwtUtil.generateToken(user.getId()));
