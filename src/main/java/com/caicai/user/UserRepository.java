@@ -17,6 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     @Modifying
-    @Query("DELETE FROM User u WHERE u.isDemo = true AND u.createdAt < :cutoff")
+    @Query("DELETE FROM User u WHERE u.demo = true AND u.createdAt < :cutoff")
     int deleteByIsDemoTrueAndCreatedAtBefore(@Param("cutoff") LocalDateTime cutoff);
 }
