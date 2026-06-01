@@ -60,9 +60,16 @@ public class GoalService {
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
             ResponseEntity<String> response = restTemplate.postForEntity(ANTHROPIC_API_URL, entity, String.class);
 
+            log.info("Anthropic response: {}", response.getBody()); // ADD THIS
+
             JsonNode root = objectMapper.readTree(response.getBody());
             String text = root.path("content").get(0).path("text").asText();
+
+            log.info("Parsed AI text: {}", text); // ADD THIS
+
             JsonNode suggestion = objectMapper.readTree(text);
+
+            log.info("Suggestion calories: {}", suggestion.path("calories").asInt()); // ADD THIS
 
             return new GoalDtos.SuggestResponse(
                     suggestion.path("calories").asInt(),
@@ -73,7 +80,7 @@ public class GoalService {
                     suggestion.path("explanation").asText()
             );
         } catch (Exception e) {
-            log.error("AI goal suggestion failed", e);
+            log.error("AI goal suggestion failed: {}", e.getMessage(), e); // IMPROVE THIS
             throw new AppException(HttpStatus.SERVICE_UNAVAILABLE, "Goal suggestion is temporarily unavailable. Please set your goals manually.");
         }
     }
